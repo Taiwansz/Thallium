@@ -1,0 +1,75 @@
+<html>
+<head>
+<title>register.html</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<style type="text/css">
+.s0 { color: #89ddff;}
+.s1 { color: #c3cee3;}
+.s2 { color: #ffcb6b; font-style: italic;}
+.s3 { color: #f07178;}
+.s4 { color: #c3e88d;}
+</style>
+</head>
+<body bgcolor="#263238">
+<table CELLSPACING=0 CELLPADDING=5 COLS=1 WIDTH="100%" BGCOLOR="#606060" >
+<tr><td><center>
+<font face="Arial, Helvetica" color="#000000">
+register.html</font>
+</center></td></tr></table>
+<pre><span class="s0">&lt;!DOCTYPE </span><span class="s2">html</span><span class="s0">&gt;</span>
+<span class="s0">&lt;</span><span class="s3">html</span><span class="s0">&gt;</span>
+<span class="s0">&lt;</span><span class="s3">head</span><span class="s0">&gt;</span>
+    <span class="s0">&lt;</span><span class="s3">title</span><span class="s0">&gt;</span><span class="s1">Bank App - Cadastro</span><span class="s0">&lt;/</span><span class="s3">title</span><span class="s0">&gt;</span>
+    <span class="s0">&lt;</span><span class="s3">link </span><span class="s2">rel</span><span class="s4">=&quot;stylesheet&quot; </span><span class="s2">href</span><span class="s4">=&quot;https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css&quot;</span><span class="s0">&gt;</span>
+    <span class="s0">&lt;</span><span class="s3">link </span><span class="s2">rel</span><span class="s4">=&quot;stylesheet&quot; </span><span class="s2">href</span><span class="s4">=&quot;{{ url_for('static', filename='styles.css') }}&quot;</span><span class="s0">&gt;</span>
+<span class="s0">&lt;/</span><span class="s3">head</span><span class="s0">&gt;</span>
+<span class="s0">&lt;</span><span class="s3">body </span><span class="s2">class</span><span class="s4">=&quot;bank-app-register&quot; </span><span class="s2">style</span><span class="s4">=&quot;background-image: url('{{ url_for('static', filename='images/background.png') }}'); background-size: cover; background-position: center; background-repeat: no-repeat; background-attachment: fixed;&quot;</span><span class="s0">&gt;</span>
+    <span class="s0">&lt;</span><span class="s3">div </span><span class="s2">class</span><span class="s4">=&quot;container&quot;</span><span class="s0">&gt;</span>
+        <span class="s0">&lt;</span><span class="s3">h1</span><span class="s0">&gt;</span><span class="s1">Cadastro</span><span class="s0">&lt;/</span><span class="s3">h1</span><span class="s0">&gt;</span>
+        <span class="s0">&lt;</span><span class="s3">form </span><span class="s2">id</span><span class="s4">=&quot;register-form&quot;</span><span class="s0">&gt;</span>
+            <span class="s0">&lt;</span><span class="s3">label </span><span class="s2">for</span><span class="s4">=&quot;name&quot;</span><span class="s0">&gt;</span><span class="s1">Nome</span><span class="s0">&lt;/</span><span class="s3">label</span><span class="s0">&gt;</span>
+            <span class="s0">&lt;</span><span class="s3">input </span><span class="s2">type</span><span class="s4">=&quot;text&quot; </span><span class="s2">id</span><span class="s4">=&quot;name&quot; </span><span class="s2">name</span><span class="s4">=&quot;name&quot; </span><span class="s2">placeholder</span><span class="s4">=&quot;Digite seu nome&quot; </span><span class="s2">required</span><span class="s0">&gt;</span>
+
+            <span class="s0">&lt;</span><span class="s3">label </span><span class="s2">for</span><span class="s4">=&quot;email&quot;</span><span class="s0">&gt;</span><span class="s1">Email</span><span class="s0">&lt;/</span><span class="s3">label</span><span class="s0">&gt;</span>
+            <span class="s0">&lt;</span><span class="s3">input </span><span class="s2">type</span><span class="s4">=&quot;email&quot; </span><span class="s2">id</span><span class="s4">=&quot;register-email&quot; </span><span class="s2">name</span><span class="s4">=&quot;email&quot; </span><span class="s2">placeholder</span><span class="s4">=&quot;Digite seu email&quot; </span><span class="s2">required</span><span class="s0">&gt;</span>
+
+            <span class="s0">&lt;</span><span class="s3">label </span><span class="s2">for</span><span class="s4">=&quot;cpf&quot;</span><span class="s0">&gt;</span><span class="s1">CPF</span><span class="s0">&lt;/</span><span class="s3">label</span><span class="s0">&gt;</span>
+            <span class="s0">&lt;</span><span class="s3">input </span><span class="s2">type</span><span class="s4">=&quot;text&quot; </span><span class="s2">id</span><span class="s4">=&quot;cpf&quot; </span><span class="s2">name</span><span class="s4">=&quot;cpf&quot; </span><span class="s2">placeholder</span><span class="s4">=&quot;Digite seu CPF&quot; </span><span class="s2">required</span><span class="s0">&gt;</span>
+
+            <span class="s0">&lt;</span><span class="s3">label </span><span class="s2">for</span><span class="s4">=&quot;password&quot;</span><span class="s0">&gt;</span><span class="s1">Senha</span><span class="s0">&lt;/</span><span class="s3">label</span><span class="s0">&gt;</span>
+            <span class="s0">&lt;</span><span class="s3">input </span><span class="s2">type</span><span class="s4">=&quot;password&quot; </span><span class="s2">id</span><span class="s4">=&quot;register-password&quot; </span><span class="s2">name</span><span class="s4">=&quot;password&quot; </span><span class="s2">placeholder</span><span class="s4">=&quot;Digite sua senha&quot; </span><span class="s2">required</span><span class="s0">&gt;</span>
+
+            <span class="s0">&lt;</span><span class="s3">button </span><span class="s2">type</span><span class="s4">=&quot;submit&quot;</span><span class="s0">&gt;</span><span class="s1">Cadastrar</span><span class="s0">&lt;/</span><span class="s3">button</span><span class="s0">&gt;</span>
+        <span class="s0">&lt;/</span><span class="s3">form</span><span class="s0">&gt;</span>
+        <span class="s0">&lt;</span><span class="s3">div </span><span class="s2">class</span><span class="s4">=&quot;toggle-link&quot;</span><span class="s0">&gt;</span>
+            <span class="s0">&lt;</span><span class="s3">span</span><span class="s0">&gt;</span><span class="s1">Já tem uma conta? </span><span class="s0">&lt;</span><span class="s3">a </span><span class="s2">href</span><span class="s4">=&quot;{{ url_for('login') }}&quot;</span><span class="s0">&gt;</span><span class="s1">Entre</span><span class="s0">&lt;/</span><span class="s3">a</span><span class="s0">&gt;&lt;/</span><span class="s3">span</span><span class="s0">&gt;</span>
+        <span class="s0">&lt;/</span><span class="s3">div</span><span class="s0">&gt;</span>
+    <span class="s0">&lt;/</span><span class="s3">div</span><span class="s0">&gt;</span>
+
+    <span class="s0">&lt;</span><span class="s3">script</span><span class="s0">&gt;</span>
+        <span class="s1">// Manipulação do formulário de cadastro</span>
+        <span class="s1">document.getElementById('register-form').addEventListener('submit', async (e) =&gt; {</span>
+            <span class="s1">e.preventDefault();</span>
+
+            <span class="s1">const nome = document.getElementById('name').value;</span>
+            <span class="s1">const email = document.getElementById('register-email').value;</span>
+            <span class="s1">const cpf = document.getElementById('cpf').value;</span>
+            <span class="s1">const senha = document.getElementById('register-password').value;</span>
+
+            <span class="s1">const response = await fetch('/cadastrar_cliente', {</span>
+                <span class="s1">method: 'POST',</span>
+                <span class="s1">headers: {</span>
+                    <span class="s1">'Content-Type': 'application/json',</span>
+                <span class="s1">},</span>
+                <span class="s1">body: JSON.stringify({ nome, email, cpf, senha }),</span>
+            <span class="s1">});</span>
+
+            <span class="s1">const data = await response.json();</span>
+            <span class="s1">alert(data.message); // Exibe a mensagem de sucesso ou erro</span>
+        <span class="s1">});</span>
+    <span class="s0">&lt;/</span><span class="s3">script</span><span class="s0">&gt;</span>
+<span class="s0">&lt;/</span><span class="s3">body</span><span class="s0">&gt;</span>
+<span class="s0">&lt;/</span><span class="s3">html</span><span class="s0">&gt;</span>
+</pre>
+</body>
+</html>

@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thalium Bank</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <!-- Bootstrap CSS -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</head>
+<body style="background-image: url('{{ url_for('static', filename='images/background.png') }}'); background-size: cover; background-position: center; background-repeat: no-repeat; background-attachment: fixed;">
+    <div class="header">
+        <div class="user-info">
+            <a href="/userinfo">
+                <i class="fas fa-user-circle"></i>
+            </a>
+            <span>Oi, {{ session['username'] }}</span>
+        </div>
+        <div class="icons">
+            <div class="dropdown">
+                <i class="fas fa-cog" onclick="toggleDropdown()"></i>
+                <div id="dropdownMenu" class="dropdown-content">
+                    <a href="/logout">Logout</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="content">
+        <div class="account-balance">
+            <h2>Conta</h2>
+            <div class="balance">R$ {{ "{:,.2f}".format(saldo).replace('.', 'X').replace(',', '.').replace('X', ',') }}</div>
+            {% if saldo == 0 %}
+                <p>Seu saldo está zerado.</p>
+            {% endif %}
+            <div class="actions">
+                <div class="action" onclick="redirectPagar()">
+                    <i class="fas fa-barcode"></i>
+                    <p>Pagar</p>
+                </div>
+                <div class="action" onclick="redirectTransferir()">
+                    <i class="fas fa-exchange-alt"></i>
+                    <p>Transferir</p>
+                </div>
+                <div class="action" onclick="redirectDeposito()">
+                    <i class="fas fa-money-bill-wave"></i>
+                    <p>Depósito</p>
+                </div>
+                <div class="action" onclick="redirectSaque()">
+                    <i class="fas fa-money-bill-alt"></i>
+                    <p>Saque</p>
+                </div>
+                <div class="action" onclick="redirectCartoes()">
+                    <i class="fas fa-credit-card"></i>
+                    <p>Cartões</p>
+                </div>
+                <!-- Novo ícone de Extrato -->
+                <div class="action" onclick="redirectHistorico()">
+                    <i class="fas fa-history"></i>
+                    <p>Extrato</p>
+                </div>
+                <div class="action" onclick="redirectEmprestimo()">
+                    <i class="fas fa-hand-holding-usd"></i>
+                     <p>Empréstimo</p>
+                </div>
+
+            </div>
+            <hr>
+            <div class="credit-card">
+                <h3>Cartão de crédito</h3>
+                <div class="details">
+                    <p>Fatura atual</p>
+                    <p><strong>R$ 1.094,80</strong></p>
+                    <p>Limite disponível: R$ 13.000</p>
+                    <div class="action" onclick="redirectCartoes()">
+                        <span> Acessar o cartão</span>
+                    </div>
+                </div>
+                <hr>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS e dependências -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>

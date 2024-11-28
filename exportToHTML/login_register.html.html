@@ -1,0 +1,87 @@
+<html>
+<head>
+<title>login_register.html</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<style type="text/css">
+.s0 { color: #89ddff;}
+.s1 { color: #f07178;}
+.s2 { color: #c3cee3;}
+.s3 { color: #ffcb6b; font-style: italic;}
+.s4 { color: #c3e88d;}
+</style>
+</head>
+<body bgcolor="#263238">
+<table CELLSPACING=0 CELLPADDING=5 COLS=1 WIDTH="100%" BGCOLOR="#606060" >
+<tr><td><center>
+<font face="Arial, Helvetica" color="#000000">
+login_register.html</font>
+</center></td></tr></table>
+<pre><span class="s0">&lt;</span><span class="s1">html</span><span class="s0">&gt;</span>
+<span class="s0">&lt;</span><span class="s1">head</span><span class="s0">&gt;</span>
+    <span class="s0">&lt;</span><span class="s1">title</span><span class="s0">&gt;</span><span class="s2">Bank App - Cadastro/Login</span><span class="s0">&lt;/</span><span class="s1">title</span><span class="s0">&gt;</span>
+    <span class="s0">&lt;</span><span class="s1">link </span><span class="s3">rel</span><span class="s4">=&quot;stylesheet&quot; </span><span class="s3">href</span><span class="s4">=&quot;https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css&quot;</span><span class="s0">&gt;</span>
+    <span class="s0">&lt;</span><span class="s1">link </span><span class="s3">rel</span><span class="s4">=&quot;stylesheet&quot; </span><span class="s3">href</span><span class="s4">=&quot;{{ url_for('static', filename='styles.css') }}&quot;</span><span class="s0">&gt;</span>
+<span class="s0">&lt;/</span><span class="s1">head</span><span class="s0">&gt;</span>
+<span class="s0">&lt;</span><span class="s1">body </span><span class="s3">class</span><span class="s4">=&quot;bank-app-login&quot;</span><span class="s0">&gt;</span>
+    <span class="s0">&lt;</span><span class="s1">div </span><span class="s3">class</span><span class="s4">=&quot;container&quot;</span><span class="s0">&gt;</span>
+        <span class="s0">&lt;</span><span class="s1">h2</span><span class="s0">&gt;</span><span class="s2">Login</span><span class="s0">&lt;/</span><span class="s1">h2</span><span class="s0">&gt;</span>
+        <span class="s0">&lt;</span><span class="s1">form </span><span class="s3">id</span><span class="s4">=&quot;login-form&quot;</span><span class="s0">&gt;</span>
+            <span class="s0">&lt;</span><span class="s1">label </span><span class="s3">for</span><span class="s4">=&quot;email&quot;</span><span class="s0">&gt;</span><span class="s2">Email</span><span class="s0">&lt;/</span><span class="s1">label</span><span class="s0">&gt;</span>
+            <span class="s0">&lt;</span><span class="s1">input </span><span class="s3">type</span><span class="s4">=&quot;email&quot; </span><span class="s3">id</span><span class="s4">=&quot;email&quot; </span><span class="s3">name</span><span class="s4">=&quot;email&quot; </span><span class="s3">placeholder</span><span class="s4">=&quot;Digite seu email&quot;</span><span class="s0">&gt;</span>
+
+            <span class="s0">&lt;</span><span class="s1">label </span><span class="s3">for</span><span class="s4">=&quot;password&quot;</span><span class="s0">&gt;</span><span class="s2">Senha</span><span class="s0">&lt;/</span><span class="s1">label</span><span class="s0">&gt;</span>
+            <span class="s0">&lt;</span><span class="s1">input </span><span class="s3">type</span><span class="s4">=&quot;password&quot; </span><span class="s3">id</span><span class="s4">=&quot;password&quot; </span><span class="s3">name</span><span class="s4">=&quot;password&quot; </span><span class="s3">placeholder</span><span class="s4">=&quot;Digite sua senha&quot;</span><span class="s0">&gt;</span>
+
+            <span class="s0">&lt;</span><span class="s1">button </span><span class="s3">type</span><span class="s4">=&quot;submit&quot;</span><span class="s0">&gt;</span><span class="s2">Entrar</span><span class="s0">&lt;/</span><span class="s1">button</span><span class="s0">&gt;</span>
+        <span class="s0">&lt;/</span><span class="s1">form</span><span class="s0">&gt;</span>
+        <span class="s0">&lt;</span><span class="s1">div </span><span class="s3">class</span><span class="s4">=&quot;toggle-link&quot;</span><span class="s0">&gt;</span>
+            <span class="s0">&lt;</span><span class="s1">span</span><span class="s0">&gt;</span><span class="s2">Não tem uma conta? </span><span class="s0">&lt;</span><span class="s1">a </span><span class="s3">href</span><span class="s4">=&quot;#&quot; </span><span class="s3">id</span><span class="s4">=&quot;toggle-register&quot;</span><span class="s0">&gt;</span><span class="s2">Cadastre-se</span><span class="s0">&lt;/</span><span class="s1">a</span><span class="s0">&gt;&lt;/</span><span class="s1">span</span><span class="s0">&gt;</span>
+        <span class="s0">&lt;/</span><span class="s1">div</span><span class="s0">&gt;</span>
+    <span class="s0">&lt;/</span><span class="s1">div</span><span class="s0">&gt;</span>
+
+    <span class="s0">&lt;</span><span class="s1">div </span><span class="s3">class</span><span class="s4">=&quot;container&quot; </span><span class="s3">style</span><span class="s4">=&quot;display: none;&quot;</span><span class="s0">&gt;</span>
+        <span class="s0">&lt;</span><span class="s1">h2</span><span class="s0">&gt;</span><span class="s2">Cadastro</span><span class="s0">&lt;/</span><span class="s1">h2</span><span class="s0">&gt;</span>
+        <span class="s0">&lt;</span><span class="s1">form </span><span class="s3">id</span><span class="s4">=&quot;register-form&quot;</span><span class="s0">&gt;</span>
+            <span class="s0">&lt;</span><span class="s1">label </span><span class="s3">for</span><span class="s4">=&quot;name&quot;</span><span class="s0">&gt;</span><span class="s2">Nome</span><span class="s0">&lt;/</span><span class="s1">label</span><span class="s0">&gt;</span>
+            <span class="s0">&lt;</span><span class="s1">input </span><span class="s3">type</span><span class="s4">=&quot;text&quot; </span><span class="s3">id</span><span class="s4">=&quot;name&quot; </span><span class="s3">name</span><span class="s4">=&quot;name&quot; </span><span class="s3">placeholder</span><span class="s4">=&quot;Digite seu nome&quot;</span><span class="s0">&gt;</span>
+
+            <span class="s0">&lt;</span><span class="s1">label </span><span class="s3">for</span><span class="s4">=&quot;email&quot;</span><span class="s0">&gt;</span><span class="s2">Email</span><span class="s0">&lt;/</span><span class="s1">label</span><span class="s0">&gt;</span>
+            <span class="s0">&lt;</span><span class="s1">input </span><span class="s3">type</span><span class="s4">=&quot;email&quot; </span><span class="s3">id</span><span class="s4">=&quot;register-email&quot; </span><span class="s3">name</span><span class="s4">=&quot;email&quot; </span><span class="s3">placeholder</span><span class="s4">=&quot;Digite seu email&quot;</span><span class="s0">&gt;</span>
+
+            <span class="s0">&lt;</span><span class="s1">label </span><span class="s3">for</span><span class="s4">=&quot;cpf&quot;</span><span class="s0">&gt;</span><span class="s2">CPF</span><span class="s0">&lt;/</span><span class="s1">label</span><span class="s0">&gt;</span>
+            <span class="s0">&lt;</span><span class="s1">input </span><span class="s3">type</span><span class="s4">=&quot;text&quot; </span><span class="s3">id</span><span class="s4">=&quot;cpf&quot; </span><span class="s3">name</span><span class="s4">=&quot;cpf&quot; </span><span class="s3">placeholder</span><span class="s4">=&quot;Digite seu CPF&quot;</span><span class="s0">&gt;</span>
+
+            <span class="s0">&lt;</span><span class="s1">label </span><span class="s3">for</span><span class="s4">=&quot;password&quot;</span><span class="s0">&gt;</span><span class="s2">Senha</span><span class="s0">&lt;/</span><span class="s1">label</span><span class="s0">&gt;</span>
+            <span class="s0">&lt;</span><span class="s1">input </span><span class="s3">type</span><span class="s4">=&quot;password&quot; </span><span class="s3">id</span><span class="s4">=&quot;register-password&quot; </span><span class="s3">name</span><span class="s4">=&quot;password&quot; </span><span class="s3">placeholder</span><span class="s4">=&quot;Digite sua senha&quot;</span><span class="s0">&gt;</span>
+
+            <span class="s0">&lt;</span><span class="s1">button </span><span class="s3">type</span><span class="s4">=&quot;submit&quot;</span><span class="s0">&gt;</span><span class="s2">Cadastrar</span><span class="s0">&lt;/</span><span class="s1">button</span><span class="s0">&gt;</span>
+        <span class="s0">&lt;/</span><span class="s1">form</span><span class="s0">&gt;</span>
+        <span class="s0">&lt;</span><span class="s1">div </span><span class="s3">class</span><span class="s4">=&quot;toggle-link&quot;</span><span class="s0">&gt;</span>
+            <span class="s0">&lt;</span><span class="s1">span</span><span class="s0">&gt;</span><span class="s2">Já tem uma conta? </span><span class="s0">&lt;</span><span class="s1">a </span><span class="s3">href</span><span class="s4">=&quot;#&quot; </span><span class="s3">id</span><span class="s4">=&quot;toggle-login&quot;</span><span class="s0">&gt;</span><span class="s2">Entre</span><span class="s0">&lt;/</span><span class="s1">a</span><span class="s0">&gt;&lt;/</span><span class="s1">span</span><span class="s0">&gt;</span>
+        <span class="s0">&lt;/</span><span class="s1">div</span><span class="s0">&gt;</span>
+    <span class="s0">&lt;/</span><span class="s1">div</span><span class="s0">&gt;</span>
+
+    <span class="s0">&lt;</span><span class="s1">script</span><span class="s0">&gt;</span>
+        <span class="s2">const toggleRegister = document.getElementById('toggle-register');</span>
+        <span class="s2">const toggleLogin = document.getElementById('toggle-login');</span>
+        <span class="s2">const loginForm = document.getElementById('login-form').parentElement;</span>
+        <span class="s2">const registerForm = document.getElementById('register-form').parentElement;</span>
+
+        <span class="s2">// Exibir o formulário de registro e ocultar o de login</span>
+        <span class="s2">toggleRegister.addEventListener('click', (e) =&gt; {</span>
+            <span class="s2">e.preventDefault(); // Previne o comportamento padrão do link</span>
+            <span class="s2">loginForm.style.display = 'none'; // Oculta o formulário de login</span>
+            <span class="s2">registerForm.style.display = 'block'; // Exibe o formulário de cadastro</span>
+        <span class="s2">});</span>
+
+        <span class="s2">// Exibir o formulário de login e ocultar o de registro</span>
+        <span class="s2">toggleLogin.addEventListener('click', (e) =&gt; {</span>
+            <span class="s2">e.preventDefault(); // Previne o comportamento padrão do link</span>
+            <span class="s2">loginForm.style.display = 'block'; // Exibe o formulário de login</span>
+            <span class="s2">registerForm.style.display = 'none'; // Oculta o formulário de cadastro</span>
+        <span class="s2">});</span>
+    <span class="s0">&lt;/</span><span class="s1">script</span><span class="s0">&gt;</span>
+<span class="s0">&lt;/</span><span class="s1">body</span><span class="s0">&gt;</span>
+<span class="s0">&lt;/</span><span class="s1">html</span><span class="s0">&gt;</span></pre>
+</body>
+</html>

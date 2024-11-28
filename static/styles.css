@@ -1,0 +1,801 @@
+body {
+    margin: 0;
+    padding: 0;
+    background-color: #f5f5f5;
+    font-family: 'Arial', sans-serif;
+    color: #203763;
+    transition: background-color 0.3s ease;
+}
+
+h1, h2, h3 {
+    font-family: 'Playfair Display', serif;
+    font-weight: 700;
+}
+
+h4, h5 {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 600;
+}
+
+body, p, li {
+    font-family: 'Roboto', sans-serif;
+    font-weight: 400;
+}
+
+.header {
+    background-color: #203763;
+    color: white;
+    padding: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    border-bottom: 3px solid #4E6285;
+    transition: background-color 0.3s ease;
+}
+
+.header:hover {
+    background-color: rgba(32, 55, 99, 0.9);
+}
+
+.header .user-info {
+    display: flex;
+    align-items: center;
+}
+
+.header .user-info i {
+    font-size: 26px;
+    margin-right: 10px;
+}
+
+.header .icons i {
+    font-size: 22px;
+    margin-left: 20px;
+    transition: color 0.3s ease-in-out, transform 0.3s ease; /* Adicionando transformação */
+}
+
+.header .icons i:hover {
+    color: #4E6285;
+    transform: scale(1.2);
+}
+
+.content {
+    padding: 20px;
+    max-width: 1200px;
+    margin: 0 auto;
+    opacity: 0;
+    animation: fadeIn 0.5s forwards;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+.actions {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 20px;
+}
+
+.actions .action {
+    text-align: center;
+    flex: 1;
+    transition: transform 0.3s ease;
+}
+
+.actions .action:hover {
+    transform: scale(1.05);
+}
+
+.actions .action i {
+    font-size: 24px;
+    color: #4E6285;
+}
+
+.actions .action p {
+    margin: 5px 0 0;
+    font-size: 14px;
+}
+
+.transfer-section form,
+.send-pix-section form,
+.user-info-section form,
+.loan-section form,
+.payment-section form {
+    display: flex;
+    flex-direction: column;
+    animation: slideIn 0.5s forwards;
+}
+
+@keyframes slideIn {
+    from {
+        transform: translateY(-20px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+.payment-section form input:focus,
+.payment-section form button:hover {
+    border-color: #4E6285;
+    box-shadow: 0 0 8px rgba(0, 0, 0, 0.2);
+}
+
+.payment-section form button {
+    background-color: #203763;
+    color: white;
+    font-weight: 600;
+    letter-spacing: 1px;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.payment-section form button:hover {
+    background-color: #4E6285;
+    transform: translateY(-2px); /* Levanta o botão ao passar o mouse */
+}
+
+.confirmation-section {
+    background-color: #F9F9F9;
+    padding: 20px;
+    border-radius: 10px;
+    margin-top: 30px;
+    border-left: 5px solid #203763;
+    opacity: 0;
+    animation: fadeIn 0.5s forwards;
+}
+
+.back-button-container {
+    margin-bottom: 20px;
+}
+
+.back-button i {
+    margin-right: 10px;
+    font-size: 18px;
+}
+
+.back-button:hover {
+    background-color: #203763;
+    transform: scale(1.05);
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.bank-app-login {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+.bank-app-login .container {
+    background-color: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    width: 300px;
+    max-width: 90%;
+    transform: translateY(-20px);
+    opacity: 0;
+    animation: slideIn 0.5s forwards;
+}
+
+.bank-app-login .container h1 {
+    margin: 0 0 20px;
+    color: #333;
+    text-align: center;
+}
+
+.bank-app-login .container form {
+    display: flex;
+    flex-direction: column;
+}
+
+.bank-app-login .container form label {
+    margin: 10px 0 5px;
+    font-size: 14px;
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 600;
+}
+
+.bank-app-login .container form input,
+.bank-app-login .container form button {
+    padding: 10px;
+    font-size: 14px;
+    margin-bottom: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease; /* Transição suave */
+}
+
+.bank-app-login .container form input:focus {
+    border-color: #4E6285;
+    outline: none;
+    box-shadow: 0 0 5px rgba(78, 98, 133, 0.5); /* Sombra ao focar */
+}
+
+.bank-app-login .container form button {
+    background-color: #4E6285;
+    color: white;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.bank-app-login .container form button:hover {
+    background-color: #203763;
+    transform: translateY(-2px); /* Levanta o botão ao passar o mouse */
+}
+
+.bank-app-login .container .toggle-link {
+    text-align: center;
+    color: black;
+    margin-top: 10px;
+    font-size: 14px;
+}
+
+.bank-app-login .container .toggle-link a {
+    color: #6a0dad;
+    text-decoration: none;
+}
+
+.container {
+    width: 100%;
+    max-width: 400px;
+    margin: 100px auto;
+    padding: 20px;
+    background-color: white;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    text-align: left;
+    transform: translateY(-20px);
+    opacity: 0;
+    animation: slideIn 0.5s forwards;
+}
+
+.container h1 {
+    margin: 0 0 20px;
+    color: #333;
+    text-align: center;
+}
+
+.container label {
+    font-weight: bold;
+    color: #333;
+    margin-top: 10px;
+    display: block;
+}
+
+.container input {
+    width: 90%;
+    padding: 12px;
+    margin: 10px 0;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    font-size: 16px;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease; /* Transição suave */
+}
+
+.container input:focus {
+    border-color: #4E6285;
+    outline: none;
+    box-shadow: 0 0 5px rgba(78, 98, 133, 0.5); /* Sombra ao focar */
+}
+
+.container button {
+    background-color: #4E6285;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    padding: 15px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.container button:hover {
+    background-color: #203763;
+    transform: translateY(-2px); /* Levanta o botão ao passar o mouse */
+}
+
+.toggle-link {
+    margin-top: 20px;
+    font-size: 14px;
+}
+
+.toggle-link a {
+    color: #4E6285;
+    text-decoration: none;
+}
+
+.toggle-link a:hover {
+    text-decoration: underline;
+}
+
+.account-balance,
+.pix-section,
+.card-section,
+.loan-section,
+.statement-section,
+ .transfer-section,
+.send-pix-section,
+.user-info-section,
+.payment-section,
+.confirmation-section {
+    background-color: white;
+    padding: 20px;
+    border-radius: 10px;
+    margin-bottom: 20px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    opacity: 0;
+    animation: fadeIn 0.5s forwards;
+}
+
+.account-balance h2,
+.pix-section h2,
+.card-section h3,
+.loan-section h2,
+.statement-section h2,
+.transfer-section h2,
+.send-pix-section h2,
+.user-info-section h2,
+.payment-section h2,
+.confirmation-section h3 {
+    margin: 0;
+    font-size: 30px;
+    color: #333;
+}
+
+.account-balance .balance,
+.statement-section .transaction .amount {
+    font-size: 24px;
+    margin: 10px 0;
+    color: #203763;
+}
+
+.statement-section .transaction .amount.negative {
+    color: white;
+}
+
+.statement-section .transaction .amount.positive {
+    color: white;
+}
+
+.actions {
+    display: flex;
+    justify-content: space-between;
+    gap: 15px;
+    margin-top: 20px;
+}
+
+.actions .action {
+    text-align: center;
+    flex: 1;
+    transition: transform 0.2s ease;
+}
+
+.actions .action:hover {
+    transform: scale(1.05);
+}
+
+.actions .action i {
+    font-size: 24px;
+    color: #4E6285;
+}
+
+.actions .action p {
+    margin: 5px 0 0;
+    font-size: 14px;
+    color: #333;
+}
+
+.actions .action:hover i {
+    color: #203763;
+}
+
+.credit-card {
+    background-color: #F5F5F5;
+    padding: 15px;
+    border-radius: 8px;
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease; /* Adicionando sombra */
+}
+
+.credit-card:hover {
+    transform: scale(1.02);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2); /* Sombra mais intensa ao passar o mouse */
+}
+
+.credit-card h3 {
+    font-size: 20px;
+    color: #203763;
+}
+
+.credit-card .details p {
+    font-size: 16px;
+}
+
+.flash-messages {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 1000;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.flash-message {
+    padding: 15px 25px;
+    border-radius: 12px;
+    color: #fff;
+    font-size: 16px;
+    font-family: 'Arial', sans-serif;
+    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    animation: slideIn 0.4s ease-out, fadeOut 0.4s 4.5s ease-in forwards;
+    opacity: 0.95;
+    transition: opacity 0.4s;
+}
+
+.flash-message.error {
+    background-color: #d9534f;
+}
+
+.flash-message.success {
+    background-color: #5cb85c;
+}
+
+.flash-message.info {
+    background-color: #5bc0de;
+}
+
+.flash-message.warning {
+    background-color: #f0ad4e;
+}
+
+@keyframes slideIn {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 0.95;
+    }
+}
+
+@keyframes fadeOut {
+    to {
+        opacity: 0;
+        transform: translateX(100%);
+    }
+}
+
+.credit-card-section {
+    background-color: white;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    opacity: 0;
+    animation: fadeIn 0.5s forwards;
+}
+
+.credit-card-section h2 {
+    font-size: 24px;
+    margin-bottom: 20px;
+    color: #203763;
+}
+
+.details p {
+    font-size: 16px;
+}
+
+.balance {
+    font-size: 18px;
+    font-weight: bold color: #8a05be;
+}
+
+.credit-card-info h3 {
+    font-size: 20px;
+    margin-top: 20px;
+    color: #203763;
+}
+
+.info p {
+    font-size: 14px;
+    color: #333;
+}
+
+.container {
+    background-color: white;
+    width: 375px;
+    border-radius: 20px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    box-sizing: border-box;
+    margin-top: 40px;
+    transform: translateY(-20px);
+    opacity: 0;
+    animation: slideIn 0.5s forwards;
+}
+
+.container .header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.container .header i {
+    font-size: 20px;
+}
+
+.container .header h1 {
+    font-size: 18px;
+    margin: 0;
+    color: #203763;
+}
+
+.card {
+    background-color: #203763;
+    border-radius: 10px;
+    padding: 20px;
+    color: white;
+    margin: 20px 0;
+    position: relative;
+    height: 150px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease; /* Adicionando sombra */
+}
+
+.card:hover {
+    transform: scale(1.02);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2); /* Sombra mais intensa ao passar o mouse */
+}
+
+.card .details {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 10px;
+}
+
+.card .details span {
+    font-size: 12px;
+}
+
+.card .number {
+    position: absolute;
+    bottom: 20px;
+    left: 20px;
+    font-size: 16px;
+}
+
+.card .mastercard {
+    position: absolute;
+    bottom: 20px;
+    right: 20px;
+    font-size: 24px;
+}
+
+.info {
+    margin: 10px 0;
+}
+
+.info div {
+    display: flex;
+    justify-content: space-between;
+    margin: 5px 0;
+}
+
+.info div span {
+    font-size: 14px;
+}
+
+.info div .copy {
+    color: #8a05be;
+    cursor: pointer;
+}
+
+.dropdown {
+    position: relative;
+    display: inline-block;
+}
+
+.dropdown-content {
+    display: none;
+    position: absolute;
+    background-color: #f1f1f1;
+    min-width: 160px;
+    z-index: 1;
+}
+
+.dropdown-content a {
+    color: black;
+    padding: 12px 16px;
+    text-decoration: none;
+    display: block;
+    transition: background-color 0.3s ease;
+}
+
+.dropdown-content a:hover {
+    background-color: #ddd;
+}
+
+.dropdown:hover .dropdown-content {
+    display: block;
+}
+
+/* Estilos Gerais */
+.statement-section {
+    background-color: #fff;
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    opacity: 0;
+    animation: fadeIn 0.5s forwards;
+}
+
+h2 {
+    font-size: 24px;
+    color: #203763;
+    margin-bottom: 20px;
+    text-align: center;
+    font-weight: 600;
+}
+
+/* Estilos para as transações */
+.transaction {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px;
+    margin-bottom: 15px;
+    border-radius: 6px;
+    background-color: #f9f9f9;
+    transition: background-color 0.3s ease;
+}
+
+.transaction:hover {
+    background-color: #f1f4f9;
+}
+
+.details {
+    display: flex;
+    flex-direction: column;
+}
+
+.details span {
+    font-size: 16px;
+    color: #4e6285;
+}
+
+.amount {
+    font-size: 18px;
+    font-weight: bold;
+    padding: 10px 15px;
+    border-radius: 5px;
+    text-align: center;
+    min-width: 120px;
+    transition: transform 0.3s ease;
+}
+
+.amount:hover {
+    transform: scale(1.05);
+}
+
+/* Estilo para valores positivos e negativos */
+.amount.positive {
+    background-color: #4caf50;
+    color: white;
+}
+
+.amount.negative {
+    background-color: #f44336;
+    color: white;
+}
+
+/* Responsividade */
+@media (max-width: 768px) {
+    .content {
+        padding: 10px;
+    }
+
+    .statement-section {
+        padding: 15px;
+    }
+
+    h2 {
+        font-size: 20px;
+    }
+
+    .transaction {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .amount {
+        margin-top: 10px;
+    }
+}
+
+.settings-section h3,
+.preferences-section h3,
+.account-settings-section h3 {
+    font-size: 18px;
+    color: #8a05be;
+    margin-bottom: 10px;
+}
+
+/* Form Inputs */
+form {
+    display: flex;
+    flex-direction: column;
+}
+
+form label {
+    font-size: 14px;
+    margin-bottom: 5px;
+    color: #555;
+}
+
+form input {
+    padding: 10px;
+    margin-bottom: 15px;
+    font-size: 14px;
+    border-radius: 10px;
+    border: 1px solid #ccc;
+    outline: none;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+form input:focus {
+    border-color: #8a05be;
+    box-shadow: 0 0 5px rgba(138, 5, 190, 0.3);
+}
+
+form button {
+    padding: 12px;
+    font-size: 16px;
+    color: #fff;
+    background-color: #8a05be;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+form button:hover {
+    background-color: #66048f;
+    transform: scale(1.05);
+}
+
+/* Checkbox Styles */
+form label input {
+    margin-right: 10px;
+}
+
+/* Section Buttons */
+.preferences-section form button,
+.account-settings-section form button {
+    align-self: flex-start;
+    margin-top: 10px;
+}
+
+/* Icons */
+.icons i {
+    font-size: 22px;
+    color: #8a05be;
+    cursor: pointer;
+    transition: transform 0.3s ease;
+}
+
+.icons i:hover {
+    transform: scale(1.1);
+}

@@ -1,0 +1,64 @@
+<html>
+<head>
+<title>user_info.html</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<style type="text/css">
+.s0 { color: #89ddff;}
+.s1 { color: #c3cee3;}
+.s2 { color: #ffcb6b; font-style: italic;}
+.s3 { color: #f07178;}
+.s4 { color: #c3e88d;}
+</style>
+</head>
+<body bgcolor="#263238">
+<table CELLSPACING=0 CELLPADDING=5 COLS=1 WIDTH="100%" BGCOLOR="#606060" >
+<tr><td><center>
+<font face="Arial, Helvetica" color="#000000">
+user_info.html</font>
+</center></td></tr></table>
+<pre><span class="s0">&lt;!DOCTYPE </span><span class="s2">html</span><span class="s0">&gt;</span>
+<span class="s0">&lt;</span><span class="s3">html </span><span class="s2">lang</span><span class="s4">=&quot;pt-BR&quot;</span><span class="s0">&gt;</span>
+<span class="s0">&lt;</span><span class="s3">head</span><span class="s0">&gt;</span>
+    <span class="s0">&lt;</span><span class="s3">meta </span><span class="s2">charset</span><span class="s4">=&quot;UTF-8&quot;</span><span class="s0">&gt;</span>
+    <span class="s0">&lt;</span><span class="s3">meta </span><span class="s2">name</span><span class="s4">=&quot;viewport&quot; </span><span class="s2">content</span><span class="s4">=&quot;width=device-width, initial-scale=1.0&quot;</span><span class="s0">&gt;</span>
+    <span class="s0">&lt;</span><span class="s3">title</span><span class="s0">&gt;</span><span class="s1">Thalium Bank - Informações do Usuário</span><span class="s0">&lt;/</span><span class="s3">title</span><span class="s0">&gt;</span>
+    <span class="s0">&lt;</span><span class="s3">link </span><span class="s2">rel</span><span class="s4">=&quot;stylesheet&quot; </span><span class="s2">href</span><span class="s4">=&quot;{{ url_for('static', filename='styles.css') }}&quot;</span><span class="s0">&gt;</span>
+    <span class="s0">&lt;</span><span class="s3">link </span><span class="s2">rel</span><span class="s4">=&quot;stylesheet&quot; </span><span class="s2">href</span><span class="s4">=&quot;https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css&quot;</span><span class="s0">&gt;</span>
+<span class="s0">&lt;/</span><span class="s3">head</span><span class="s0">&gt;</span>
+<span class="s0">&lt;</span><span class="s3">body</span><span class="s0">&gt;</span>
+    <span class="s0">&lt;</span><span class="s3">div </span><span class="s2">class</span><span class="s4">=&quot;header&quot;</span><span class="s0">&gt;</span>
+        <span class="s0">&lt;</span><span class="s3">div </span><span class="s2">class</span><span class="s4">=&quot;user-info&quot;</span><span class="s0">&gt;</span>
+            <span class="s0">&lt;</span><span class="s3">i </span><span class="s2">class</span><span class="s4">=&quot;fas fa-user-circle&quot;</span><span class="s0">&gt;&lt;/</span><span class="s3">i</span><span class="s0">&gt;</span>
+            <span class="s0">&lt;</span><span class="s3">span</span><span class="s0">&gt;</span><span class="s1">Oi, Gabriela</span><span class="s0">&lt;/</span><span class="s3">span</span><span class="s0">&gt;</span>
+        <span class="s0">&lt;/</span><span class="s3">div</span><span class="s0">&gt;</span>
+        <span class="s0">&lt;</span><span class="s3">div </span><span class="s2">class</span><span class="s4">=&quot;icons&quot;</span><span class="s0">&gt;</span>
+            <span class="s0">&lt;</span><span class="s3">i </span><span class="s2">class</span><span class="s4">=&quot;fas fa-search&quot;</span><span class="s0">&gt;&lt;/</span><span class="s3">i</span><span class="s0">&gt;</span>
+            <span class="s0">&lt;</span><span class="s3">i </span><span class="s2">class</span><span class="s4">=&quot;fas fa-bell&quot;</span><span class="s0">&gt;&lt;/</span><span class="s3">i</span><span class="s0">&gt;</span>
+            <span class="s0">&lt;</span><span class="s3">i </span><span class="s2">class</span><span class="s4">=&quot;fas fa-cog&quot;</span><span class="s0">&gt;&lt;/</span><span class="s3">i</span><span class="s0">&gt;</span>
+        <span class="s0">&lt;/</span><span class="s3">div</span><span class="s0">&gt;</span>
+    <span class="s0">&lt;/</span><span class="s3">div</span><span class="s0">&gt;</span>
+    <span class="s0">&lt;</span><span class="s3">div </span><span class="s2">class</span><span class="s4">=&quot;content&quot;</span><span class="s0">&gt;</span>
+        <span class="s0">&lt;</span><span class="s3">div </span><span class="s2">class</span><span class="s4">=&quot;user-info-section&quot;</span><span class="s0">&gt;</span>
+            <span class="s0">&lt;</span><span class="s3">h2</span><span class="s0">&gt;</span><span class="s1">Informações do Usuário</span><span class="s0">&lt;/</span><span class="s3">h2</span><span class="s0">&gt;</span>
+            <span class="s0">&lt;</span><span class="s3">form</span><span class="s0">&gt;</span>
+                <span class="s0">&lt;</span><span class="s3">label </span><span class="s2">for</span><span class="s4">=&quot;name&quot;</span><span class="s0">&gt;</span><span class="s1">Nome</span><span class="s0">&lt;/</span><span class="s3">label</span><span class="s0">&gt;</span>
+                <span class="s0">&lt;</span><span class="s3">input </span><span class="s2">type</span><span class="s4">=&quot;text&quot; </span><span class="s2">id</span><span class="s4">=&quot;name&quot; </span><span class="s2">name</span><span class="s4">=&quot;name&quot; </span><span class="s2">placeholder</span><span class="s4">=&quot;Gabriela&quot; </span><span class="s2">required</span><span class="s0">&gt;</span>
+
+                <span class="s0">&lt;</span><span class="s3">label </span><span class="s2">for</span><span class="s4">=&quot;email&quot;</span><span class="s0">&gt;</span><span class="s1">Email</span><span class="s0">&lt;/</span><span class="s3">label</span><span class="s0">&gt;</span>
+                <span class="s0">&lt;</span><span class="s3">input </span><span class="s2">type</span><span class="s4">=&quot;email&quot; </span><span class="s2">id</span><span class="s4">=&quot;email&quot; </span><span class="s2">name</span><span class="s4">=&quot;email&quot; </span><span class="s2">placeholder</span><span class="s4">=&quot;gabriela@example.com&quot; </span><span class="s2">required</span><span class="s0">&gt;</span>
+
+                <span class="s0">&lt;</span><span class="s3">label </span><span class="s2">for</span><span class="s4">=&quot;phone&quot;</span><span class="s0">&gt;</span><span class="s1">Telefone</span><span class="s0">&lt;/</span><span class="s3">label</span><span class="s0">&gt;</span>
+                <span class="s0">&lt;</span><span class="s3">input </span><span class="s2">type</span><span class="s4">=&quot;text&quot; </span><span class="s2">id</span><span class="s4">=&quot;phone&quot; </span><span class="s2">name</span><span class="s4">=&quot;phone&quot; </span><span class="s2">placeholder</span><span class="s4">=&quot;(11) 99999-9999&quot; </span><span class="s2">required</span><span class="s0">&gt;</span>
+
+                <span class="s0">&lt;</span><span class="s3">label </span><span class="s2">for</span><span class="s4">=&quot;address&quot;</span><span class="s0">&gt;</span><span class="s1">Endereço</span><span class="s0">&lt;/</span><span class="s3">label</span><span class="s0">&gt;</span>
+                <span class="s0">&lt;</span><span class="s3">input </span><span class="s2">type</span><span class="s4">=&quot;text&quot; </span><span class="s2">id</span><span class="s4">=&quot;address&quot; </span><span class="s2">name</span><span class="s4">=&quot;address&quot; </span><span class="s2">placeholder</span><span class="s4">=&quot;Rua Exemplo, 123&quot; </span><span class="s2">required</span><span class="s0">&gt;</span>
+
+                <span class="s0">&lt;</span><span class="s3">button </span><span class="s2">type</span><span class="s4">=&quot;submit&quot;</span><span class="s0">&gt;</span><span class="s1">Salvar</span><span class="s0">&lt;/</span><span class="s3">button</span><span class="s0">&gt;</span>
+            <span class="s0">&lt;/</span><span class="s3">form</span><span class="s0">&gt;</span>
+        <span class="s0">&lt;/</span><span class="s3">div</span><span class="s0">&gt;</span>
+    <span class="s0">&lt;/</span><span class="s3">div</span><span class="s0">&gt;</span>
+<span class="s0">&lt;/</span><span class="s3">body</span><span class="s0">&gt;</span>
+<span class="s0">&lt;/</span><span class="s3">html</span><span class="s0">&gt;</span>
+</pre>
+</body>
+</html>

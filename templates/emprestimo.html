@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thalium Bank - Histórico de Transações</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+</head>
+<body style="background-image: url('{{ url_for('static', filename='images/background.png') }}'); background-size: cover; background-position: center; background-repeat: no-repeat; background-attachment: fixed;">
+    <div class="header">
+        <div class="back-button-container">
+            <a href="javascript:history.back()" class="back-button">
+                <i class="fas fa-arrow-left"></i> Voltar
+            </a>
+        </div>
+        <div class="icons">
+            <div class="dropdown">
+                <i class="fas fa-cog" onclick="toggleDropdown()"></i>
+                <div id="dropdownMenu" class="dropdown-content">
+                    <a href="/logout">Logout</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="container">
+        <h2>Solicitar Empréstimo</h2>
+        <form action="/emprestimo" method="POST">
+            <div class="form-group">
+                <label for="valor_emprestimo">Valor do Empréstimo</label>
+                <input type="number" id="valor_emprestimo" name="valor_emprestimo" required>
+            </div>
+            <div class="form-group">
+                <label for="prazo">Prazo (meses)</label>
+                <input type="number" id="prazo" name="prazo" required>
+            </div>
+            <button type="submit">Solicitar Empréstimo</button>
+        </form>
+    </div>
+</body>
+</html>

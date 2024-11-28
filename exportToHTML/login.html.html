@@ -1,0 +1,71 @@
+<html>
+<head>
+<title>login.html</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<style type="text/css">
+.s0 { color: #89ddff;}
+.s1 { color: #c3cee3;}
+.s2 { color: #ffcb6b; font-style: italic;}
+.s3 { color: #f07178;}
+.s4 { color: #c3e88d;}
+.s5 { color: #546e7a; font-style: italic;}
+</style>
+</head>
+<body bgcolor="#263238">
+<table CELLSPACING=0 CELLPADDING=5 COLS=1 WIDTH="100%" BGCOLOR="#606060" >
+<tr><td><center>
+<font face="Arial, Helvetica" color="#000000">
+login.html</font>
+</center></td></tr></table>
+<pre><span class="s0">&lt;!DOCTYPE </span><span class="s2">html</span><span class="s0">&gt;</span>
+<span class="s0">&lt;</span><span class="s3">html </span><span class="s2">lang</span><span class="s4">=&quot;pt-BR&quot;</span><span class="s0">&gt;</span>
+<span class="s0">&lt;</span><span class="s3">head</span><span class="s0">&gt;</span>
+    <span class="s0">&lt;</span><span class="s3">meta </span><span class="s2">charset</span><span class="s4">=&quot;UTF-8&quot;</span><span class="s0">&gt;</span>
+    <span class="s0">&lt;</span><span class="s3">meta </span><span class="s2">name</span><span class="s4">=&quot;viewport&quot; </span><span class="s2">content</span><span class="s4">=&quot;width=device-width, initial-scale=1.0&quot;</span><span class="s0">&gt;</span>
+    <span class="s0">&lt;</span><span class="s3">title</span><span class="s0">&gt;</span><span class="s1">Bank App - Login</span><span class="s0">&lt;/</span><span class="s3">title</span><span class="s0">&gt;</span>
+    <span class="s0">&lt;</span><span class="s3">link </span><span class="s2">rel</span><span class="s4">=&quot;stylesheet&quot; </span><span class="s2">href</span><span class="s4">=&quot;https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css&quot;</span><span class="s0">&gt;</span>
+    <span class="s0">&lt;</span><span class="s3">link </span><span class="s2">rel</span><span class="s4">=&quot;stylesheet&quot; </span><span class="s2">href</span><span class="s4">=&quot;{{ url_for('static', filename='styles.css') }}&quot;</span><span class="s0">&gt;</span>
+    <span class="s0">&lt;</span><span class="s3">script </span><span class="s2">src</span><span class="s4">=&quot;{{ url_for('static', filename='script.js') }}&quot;</span><span class="s0">&gt;&lt;/</span><span class="s3">script</span><span class="s0">&gt;</span>
+<span class="s0">&lt;/</span><span class="s3">head</span><span class="s0">&gt;</span>
+<span class="s0">&lt;</span><span class="s3">body </span><span class="s2">class</span><span class="s4">=&quot;bank-app-login&quot; </span><span class="s2">style</span><span class="s4">=&quot;background-image: url('{{ url_for('static', filename='images/background.png') }}'); background-size: cover; background-position: center; background-repeat: no-repeat; background-attachment: fixed;&quot;</span><span class="s0">&gt;</span>
+
+    <span class="s5">&lt;!-- Contêiner de popup de erro --&gt;</span>
+        <span class="s1">{% with messages = get_flashed_messages(with_categories=true) %}</span>
+      <span class="s1">{% if messages %}</span>
+        <span class="s0">&lt;</span><span class="s3">div </span><span class="s2">class</span><span class="s4">=&quot;flash-messages&quot;</span><span class="s0">&gt;</span>
+          <span class="s1">{% for category, message in messages %}</span>
+            <span class="s0">&lt;</span><span class="s3">div </span><span class="s2">class</span><span class="s4">=&quot;flash-message {{ category }}&quot;</span><span class="s0">&gt;</span>
+              <span class="s1">{{ message }}</span>
+            <span class="s0">&lt;/</span><span class="s3">div</span><span class="s0">&gt;</span>
+          <span class="s1">{% endfor %}</span>
+        <span class="s0">&lt;/</span><span class="s3">div</span><span class="s0">&gt;</span>
+      <span class="s1">{% endif %}</span>
+    <span class="s1">{% endwith %}</span>
+
+
+    <span class="s0">&lt;</span><span class="s3">div </span><span class="s2">class</span><span class="s4">=&quot;container&quot;</span><span class="s0">&gt;</span>
+        <span class="s0">&lt;</span><span class="s3">h1</span><span class="s0">&gt;</span><span class="s1">Login</span><span class="s0">&lt;/</span><span class="s3">h1</span><span class="s0">&gt;</span>
+            <span class="s0">&lt;</span><span class="s3">form </span><span class="s2">id</span><span class="s4">=&quot;login-form&quot; </span><span class="s2">method</span><span class="s4">=&quot;POST&quot; </span><span class="s2">action</span><span class="s4">=&quot;{{ url_for('login') }}&quot;</span><span class="s0">&gt;</span>
+            <span class="s0">&lt;</span><span class="s3">label </span><span class="s2">for</span><span class="s4">=&quot;email&quot;</span><span class="s0">&gt;</span><span class="s1">Email</span><span class="s0">&lt;/</span><span class="s3">label</span><span class="s0">&gt;</span>
+            <span class="s0">&lt;</span><span class="s3">input </span><span class="s2">type</span><span class="s4">=&quot;email&quot; </span><span class="s2">id</span><span class="s4">=&quot;email&quot; </span><span class="s2">name</span><span class="s4">=&quot;email&quot; </span><span class="s2">placeholder</span><span class="s4">=&quot;Digite seu email&quot; </span><span class="s2">required</span><span class="s0">&gt;</span>
+
+            <span class="s0">&lt;</span><span class="s3">label </span><span class="s2">for</span><span class="s4">=&quot;password&quot;</span><span class="s0">&gt;</span><span class="s1">Senha</span><span class="s0">&lt;/</span><span class="s3">label</span><span class="s0">&gt;</span>
+            <span class="s0">&lt;</span><span class="s3">input </span><span class="s2">type</span><span class="s4">=&quot;password&quot; </span><span class="s2">id</span><span class="s4">=&quot;password&quot; </span><span class="s2">name</span><span class="s4">=&quot;password&quot; </span><span class="s2">placeholder</span><span class="s4">=&quot;Digite sua senha&quot; </span><span class="s2">required</span><span class="s0">&gt;</span>
+
+            <span class="s0">&lt;</span><span class="s3">button </span><span class="s2">type</span><span class="s4">=&quot;submit&quot;</span><span class="s0">&gt;</span><span class="s1">Entrar</span><span class="s0">&lt;/</span><span class="s3">button</span><span class="s0">&gt;</span>
+        <span class="s0">&lt;/</span><span class="s3">form</span><span class="s0">&gt;</span>
+        <span class="s0">&lt;</span><span class="s3">div </span><span class="s2">class</span><span class="s4">=&quot;toggle-link&quot;</span><span class="s0">&gt;</span>
+            <span class="s0">&lt;</span><span class="s3">span</span><span class="s0">&gt;</span><span class="s1">Não tem uma conta? </span><span class="s0">&lt;</span><span class="s3">a </span><span class="s2">href</span><span class="s4">=&quot;{{ url_for('cadastro') }}&quot;</span><span class="s0">&gt;</span><span class="s1">Cadastre-se</span><span class="s0">&lt;/</span><span class="s3">a</span><span class="s0">&gt;&lt;/</span><span class="s3">span</span><span class="s0">&gt;</span>
+        <span class="s0">&lt;/</span><span class="s3">div</span><span class="s0">&gt;</span>
+    <span class="s0">&lt;/</span><span class="s3">div</span><span class="s0">&gt;</span>
+
+    <span class="s0">&lt;</span><span class="s3">script</span><span class="s0">&gt;</span>
+        <span class="s1">function closePopup() {</span>
+            <span class="s1">document.getElementById('errorPopup').style.display = 'none';</span>
+        <span class="s1">}</span>
+    <span class="s0">&lt;/</span><span class="s3">script</span><span class="s0">&gt;</span>
+<span class="s0">&lt;/</span><span class="s3">body</span><span class="s0">&gt;</span>
+<span class="s0">&lt;/</span><span class="s3">html</span><span class="s0">&gt;</span>
+</pre>
+</body>
+</html>
