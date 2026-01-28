@@ -1,0 +1,9 @@
+__pycache__/
+*.pyc
+instance/
+.pytest_cache/
+.env
+app.log
+verification_dashboard.png
+verify_frontend.py
+thalium.db

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Thalium Bank - Histórico de Transações</title>
+    <title>Thalium Bank - Depósito</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
 </head>
@@ -23,14 +23,30 @@
             </div>
         </div>
     </div>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <div class="flash-messages">
+          {% for category, message in messages %}
+            <div class="flash-message {{ category }}">
+              {{ message }}
+            </div>
+          {% endfor %}
+        </div>
+      {% endif %}
+    {% endwith %}
+
         <div class="account-balance">
             <h2>Realizar Depósito</h2>
             <section class="deposit-form-container">
                 <form id="depositoForm" action="{{ url_for('deposito') }}" method="post">
-                    <input type="text" name="valor" placeholder="Valor do Depósito" required>
-                    <button type="submit">Depositar</button>
+                    {{ form.hidden_tag() }}
+                    {{ form.amount(placeholder="Valor do Depósito") }}
+                    {% for error in form.amount.errors %}
+                        <span style="color: red;">{{ error }}</span>
+                    {% endfor %}
+                    {{ form.submit() }}
                 </form>
-                <div id="message"></div>
             </section>
     </div>
 

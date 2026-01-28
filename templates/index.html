@@ -13,10 +13,10 @@
 <body style="background-image: url('{{ url_for('static', filename='images/background.png') }}'); background-size: cover; background-position: center; background-repeat: no-repeat; background-attachment: fixed;">
     <div class="header">
         <div class="user-info">
-            <a href="/userinfo">
+            <a href="#">
                 <i class="fas fa-user-circle"></i>
             </a>
-            <span>Oi, {{ session['username'] }}</span>
+            <span>Oi, {{ current_user.nome }}</span>
         </div>
         <div class="icons">
             <div class="dropdown">
@@ -27,6 +27,19 @@
             </div>
         </div>
     </div>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <div class="flash-messages">
+          {% for category, message in messages %}
+            <div class="flash-message {{ category }}">
+              {{ message }}
+            </div>
+          {% endfor %}
+        </div>
+      {% endif %}
+    {% endwith %}
+
     <div class="content">
         <div class="account-balance">
             <h2>Conta</h2>
