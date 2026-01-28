@@ -26,7 +26,7 @@
 
     <div class="container">
         <h1>Login</h1>
-            <form id="login-form" method="POST" action="{{ url_for('login') }}">
+            <form id="login-form" method="POST" action="{{ url_for('auth.login') }}">
             <label for="email">Email</label>
             <input type="email" id="email" name="email" placeholder="Digite seu email" required>
 
@@ -36,7 +36,7 @@
             <button type="submit">Entrar</button>
         </form>
         <div class="toggle-link">
-            <span>Não tem uma conta? <a href="{{ url_for('cadastro') }}">Cadastre-se</a></span>
+            <span>Não tem uma conta? <a href="{{ url_for('auth.cadastro') }}">Cadastre-se</a></span>
         </div>
     </div>
 
