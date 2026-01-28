@@ -1,5 +1,6 @@
 from flask import Flask, render_template, request, redirect, url_for, session, flash, jsonify
-import mysql.connector
+# import mysql.connector
+import sqlite3
 from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import date
 import random
@@ -8,19 +9,21 @@ import random
 app = Flask(__name__)
 app.secret_key = 'sua_chave_secreta'
 
-db_config = {
-    'user': 'tester6',
-    'password': '1233',
-    'host': 'localhost',
-    'database': 'thalium'
-}
+# db_config = {
+#     'user': 'tester6',
+#     'password': '1233',
+#     'host': 'localhost',
+#     'database': 'thalium'
+# }
 
 
 def get_db_connection():
     try:
-        connection = mysql.connector.connect(**db_config)
+        # connection = mysql.connector.connect(**db_config)
+        connection = sqlite3.connect('thalium.db')
+        connection.row_factory = sqlite3.Row
         return connection
-    except mysql.connector.Error as err:
+    except sqlite3.Error as err:
         print(f"Error: {err}")
         return None
 
@@ -53,7 +56,7 @@ def cadastrar_cliente():
         # Inserir o cliente
         query = '''
         INSERT INTO Clientes (nome, cpf, email, senha)
-        VALUES (%s, %s, %s, %s)
+        VALUES (?, ?, ?, ?)
         '''
         cursor.execute(query, (nome, cpf, email, senha_hash))
         connection.commit()
@@ -61,11 +64,11 @@ def cadastrar_cliente():
         id_cliente = cursor.lastrowid
         saldo_inicial = 0.00
         tipo_conta = 'Corrente'
-        data_abertura = date.today()
+        data_abertura = str(date.today())
 
         query_conta = '''
         INSERT INTO Contas (id_cliente, saldo, data_abertura, tipo_conta)
-        VALUES (%s, %s, %s, %s)
+        VALUES (?, ?, ?, ?)
         '''
         cursor.execute(query_conta, (id_cliente, saldo_inicial, data_abertura, tipo_conta))
         connection.commit()
@@ -78,7 +81,7 @@ def cadastrar_cliente():
 
         query_cartao = '''
         INSERT INTO cartoes (numero, validade, cvv, id_cliente)
-        VALUES (%s, %s, %s, %s)
+        VALUES (?, ?, ?, ?)
         '''
         cursor.execute(query_cartao, (numero_cartao, validade, cvv, id_cliente))
         connection.commit()
@@ -93,7 +96,7 @@ def cadastrar_cliente():
             'cvv': cvv
         })
 
-    except mysql.connector.IntegrityError:
+    except sqlite3.IntegrityError:
         return jsonify({'message': 'Erro ao cadastrar: CPF ou email já existe.'}), 400
     except Exception as e:
         return jsonify({'message': f'Erro inesperado: {str(e)}'}), 500
@@ -107,16 +110,16 @@ def index():
     if 'user_email' in session:
         user_email = session['user_email']
         connection = get_db_connection()
-        cursor = connection.cursor(dictionary=True)
+        cursor = connection.cursor()
 
         try:
-            query = 'SELECT id_cliente FROM Clientes WHERE email = %s'
+            query = 'SELECT id_cliente FROM Clientes WHERE email = ?'
             cursor.execute(query, (user_email,))
             user = cursor.fetchone()
 
             if user:
                 id_cliente = user['id_cliente']
-                query = 'SELECT saldo FROM Contas WHERE id_cliente = %s'
+                query = 'SELECT saldo FROM Contas WHERE id_cliente = ?'
                 cursor.execute(query, (id_cliente,))
                 conta = cursor.fetchone()
 
@@ -127,7 +130,7 @@ def index():
             else:
                 saldo = 0.00
 
-            cursor.fetchall()
+            # cursor.fetchall() # Not needed in sqlite usually, but ok
         except Exception as e:
             print(f"Erro ao buscar dados: {e}")
             saldo = 0.00
@@ -156,13 +159,13 @@ def transferir():
             return jsonify({'message': 'Valor de transferência deve ser positivo.'}), 400
 
         connection = get_db_connection()
-        cursor = connection.cursor(dictionary=True)
+        cursor = connection.cursor()
 
         try:
 
             sender_email = session['user_email']
             cursor.execute(
-                'SELECT numero_conta FROM Contas WHERE id_cliente = (SELECT id_cliente FROM Clientes WHERE email = %s)',
+                'SELECT numero_conta FROM Contas WHERE id_cliente = (SELECT id_cliente FROM Clientes WHERE email = ?)',
                 (sender_email,))
             sender_account = cursor.fetchone()
 
@@ -170,35 +173,35 @@ def transferir():
                 return jsonify({'message': 'Conta do remetente não encontrada.'}), 404
 
             cursor.execute(
-                'SELECT c.numero_conta FROM Contas c JOIN Clientes cl ON c.id_cliente = cl.id_cliente WHERE cl.email = %s',
+                'SELECT c.numero_conta FROM Contas c JOIN Clientes cl ON c.id_cliente = cl.id_cliente WHERE cl.email = ?',
                 (recipient_email,))
             recipient_account = cursor.fetchone()
 
             if not recipient_account:
                 return jsonify({'message': 'Destinatário não encontrado.'}), 404
 
-            cursor.execute('SELECT saldo FROM Contas WHERE numero_conta = %s', (sender_account['numero_conta'],))
+            cursor.execute('SELECT saldo FROM Contas WHERE numero_conta = ?', (sender_account['numero_conta'],))
             sender_balance = cursor.fetchone()
 
             if sender_balance['saldo'] < amount:
                 return jsonify({'message': 'Saldo insuficiente.'}), 400
 
-            cursor.execute('UPDATE Contas SET saldo = saldo - %s WHERE numero_conta = %s',
+            cursor.execute('UPDATE Contas SET saldo = saldo - ? WHERE numero_conta = ?',
                            (amount, sender_account['numero_conta']))
-            cursor.execute('UPDATE Contas SET saldo = saldo + %s WHERE numero_conta = %s',
+            cursor.execute('UPDATE Contas SET saldo = saldo + ? WHERE numero_conta = ?',
                            (amount, recipient_account['numero_conta']))
 
             cursor.execute(
-                'INSERT INTO Transacoes (numero_conta, tipo_transacao, valor, descricao) VALUES (%s, %s, %s, %s)',
+                'INSERT INTO Transacoes (numero_conta, tipo_transacao, valor, descricao) VALUES (?, ?, ?, ?)',
                 (sender_account['numero_conta'], 'Transferência', amount, description))
 
             cursor.execute(
-                'INSERT INTO Historico_Transacoes (numero_conta, tipo_transacao, valor, descricao) VALUES (%s, %s, %s, %s)',
+                'INSERT INTO Historico_Transacoes (numero_conta, tipo_transacao, valor, descricao) VALUES (?, ?, ?, ?)',
                 (sender_account['numero_conta'], 'Transferência', amount, description))
 
             connection.commit()
 
-            cursor.execute('SELECT saldo FROM Contas WHERE numero_conta = %s', (sender_account['numero_conta'],))
+            cursor.execute('SELECT saldo FROM Contas WHERE numero_conta = ?', (sender_account['numero_conta'],))
             novo_saldo = cursor.fetchone()['saldo']
             print("Novo saldo do remetente:", novo_saldo)
             return redirect(url_for('index'))
@@ -221,12 +224,12 @@ def historico():
         return jsonify({'message': 'Usuário não autenticado.'}), 401
 
     connection = get_db_connection()
-    cursor = connection.cursor(dictionary=True)
+    cursor = connection.cursor()
 
     try:
         query = '''
         SELECT numero_conta FROM Contas 
-        WHERE id_cliente = (SELECT id_cliente FROM Clientes WHERE email = %s)
+        WHERE id_cliente = (SELECT id_cliente FROM Clientes WHERE email = ?)
         '''
         cursor.execute(query, (user_email,))
         conta = cursor.fetchone()
@@ -245,9 +248,9 @@ def historico():
                 data_transacao, 
                 descricao
         FROM (
-            SELECT tipo_transacao, valor, data_transacao, descricao FROM Transacoes WHERE numero_conta = %s
+            SELECT tipo_transacao, valor, data_transacao, descricao FROM Transacoes WHERE numero_conta = ?
             UNION  -- Mudança de UNION ALL para UNION
-            SELECT tipo_transacao, valor, data_transacao, descricao FROM Historico_Transacoes WHERE numero_conta = %s
+            SELECT tipo_transacao, valor, data_transacao, descricao FROM Historico_Transacoes WHERE numero_conta = ?
             ) AS todas_transacoes
             ORDER BY data_transacao DESC
 
@@ -285,14 +288,14 @@ def pagamento_boleto():
 
         user_email = session.get('user_email')
         connection = get_db_connection()
-        cursor = connection.cursor(dictionary=True)
+        cursor = connection.cursor()
 
         try:
-            cursor.execute('SELECT id_cliente FROM Clientes WHERE email = %s', (user_email,))
+            cursor.execute('SELECT id_cliente FROM Clientes WHERE email = ?', (user_email,))
             user = cursor.fetchone()
 
             if user:
-                cursor.execute('SELECT numero_conta, saldo FROM Contas WHERE id_cliente = %s', (user['id_cliente'],))
+                cursor.execute('SELECT numero_conta, saldo FROM Contas WHERE id_cliente = ?', (user['id_cliente'],))
                 conta = cursor.fetchone()
 
                 if conta:
@@ -302,13 +305,13 @@ def pagamento_boleto():
                     # Verifica se o saldo é suficiente para o pagamento
                     if saldo_atual >= valor:
                         # Atualiza o saldo da conta
-                        cursor.execute('UPDATE Contas SET saldo = saldo - %s WHERE numero_conta = %s',
+                        cursor.execute('UPDATE Contas SET saldo = saldo - ? WHERE numero_conta = ?',
                                        (valor, numero_conta))
                         connection.commit()
 
                         # Agora, registra a transação no histórico
                         cursor.execute(
-                            'INSERT INTO Historico_Transacoes (numero_conta, tipo_transacao, valor) VALUES (%s, %s, %s)',
+                            'INSERT INTO Historico_Transacoes (numero_conta, tipo_transacao, valor) VALUES (?, ?, ?)',
                             (numero_conta, 'Pagamento Boleto', -valor))  # Registrando como valor negativo
 
                         connection.commit()
@@ -344,13 +347,13 @@ def login():
             flash('Erro na conexão com o banco de dados.', 'error')
             return render_template('login.html')
 
-        cursor = connection.cursor(dictionary=True)
+        cursor = connection.cursor()
         try:
-            query = 'SELECT id_cliente, nome, senha FROM Clientes WHERE email = %s'
+            query = 'SELECT id_cliente, nome, senha FROM Clientes WHERE email = ?'
             cursor.execute(query, (email,))
             user = cursor.fetchone()
 
-            cursor.fetchall()  # Garantir que qualquer resultado pendente seja consumido
+            # cursor.fetchall()  # Garantir que qualquer resultado pendente seja consumido
 
             if user is None:
                 flash('Usuário não encontrado.', 'error')
@@ -377,11 +380,16 @@ def saldo(numero_conta):
     if connection is None:
         return jsonify({'message': 'Erro na conexão com o banco de dados.'}), 500
 
-    cursor = connection.cursor(dictionary=True)
+    cursor = connection.cursor()
     try:
-        query = 'SELECT saldo FROM Contas WHERE numero_conta = %s'
+        query = 'SELECT saldo FROM Contas WHERE numero_conta = ?'
         cursor.execute(query, (numero_conta,))
         result = cursor.fetchone()
+
+        # Convert Row to dict for jsonify if result exists
+        if result:
+            result = dict(result)
+
     finally:
         cursor.close()
         connection.close()
@@ -402,28 +410,28 @@ def deposito():
 
         user_email = session.get('user_email')
         connection = get_db_connection()
-        cursor = connection.cursor(dictionary=True)
+        cursor = connection.cursor()
 
         try:
-            cursor.execute('SELECT id_cliente FROM Clientes WHERE email = %s', (user_email,))
+            cursor.execute('SELECT id_cliente FROM Clientes WHERE email = ?', (user_email,))
             user = cursor.fetchone()
 
             if user:
-                cursor.execute('SELECT numero_conta FROM Contas WHERE id_cliente = %s', (user['id_cliente'],))
+                cursor.execute('SELECT numero_conta FROM Contas WHERE id_cliente = ?', (user['id_cliente'],))
                 conta = cursor.fetchone()
 
                 if conta:
                     numero_conta = conta['numero_conta']
-                    cursor.execute('UPDATE Contas SET saldo = saldo + %s WHERE numero_conta = %s',
+                    cursor.execute('UPDATE Contas SET saldo = saldo + ? WHERE numero_conta = ?',
                                    (valor, numero_conta))
                     connection.commit()
 
                     cursor.execute(
-                        'INSERT INTO Transacoes (numero_conta, tipo_transacao, valor) VALUES (%s, %s, %s)',
+                        'INSERT INTO Transacoes (numero_conta, tipo_transacao, valor) VALUES (?, ?, ?)',
                         (numero_conta, 'Depósito', valor))
 
                     cursor.execute(
-                        'INSERT INTO Historico_Transacoes (numero_conta, tipo_transacao, valor) VALUES (%s, %s, %s)',
+                        'INSERT INTO Historico_Transacoes (numero_conta, tipo_transacao, valor) VALUES (?, ?, ?)',
                         (numero_conta, 'Depósito', valor))
 
                     connection.commit()
@@ -444,13 +452,13 @@ def deposito():
 def cartoes():
     if 'id_cliente' not in session:
         print("Usuário não logado, redirecionando para login...")
-        return redirect(url_for('login_post'))
+        return redirect(url_for('login')) # Fixed redirect to 'login' instead of 'login_post' which doesn't exist
 
     id_cliente = session['id_cliente']
     print(f"Usuário logado, id_cliente: {id_cliente}")
     conn = get_db_connection()
-    cursor = conn.cursor(dictionary=True)
-    cursor.execute("SELECT * FROM cartoes WHERE id_cliente = %s", (id_cliente,))
+    cursor = conn.cursor()
+    cursor.execute("SELECT * FROM cartoes WHERE id_cliente = ?", (id_cliente,))
     cartoes = cursor.fetchall()
 
     if cartoes:
@@ -485,14 +493,14 @@ def saque():
 
         user_email = session.get('user_email')
         connection = get_db_connection()
-        cursor = connection.cursor(dictionary=True)
+        cursor = connection.cursor()
 
         try:
-            cursor.execute('SELECT id_cliente FROM Clientes WHERE email = %s', (user_email,))
+            cursor.execute('SELECT id_cliente FROM Clientes WHERE email = ?', (user_email,))
             user = cursor.fetchone()
 
             if user:
-                cursor.execute('SELECT numero_conta, saldo FROM Contas WHERE id_cliente = %s', (user['id_cliente'],))
+                cursor.execute('SELECT numero_conta, saldo FROM Contas WHERE id_cliente = ?', (user['id_cliente'],))
                 conta = cursor.fetchone()
 
                 if conta:
@@ -500,16 +508,16 @@ def saque():
                     saldo_atual = conta['saldo']
 
                     if saldo_atual >= valor:
-                        cursor.execute('UPDATE Contas SET saldo = saldo - %s WHERE numero_conta = %s',
+                        cursor.execute('UPDATE Contas SET saldo = saldo - ? WHERE numero_conta = ?',
                                        (valor, numero_conta))
                         connection.commit()
 
                         cursor.execute(
-                            'INSERT INTO Transacoes (numero_conta, tipo_transacao, valor) VALUES (%s, %s, %s)',
+                            'INSERT INTO Transacoes (numero_conta, tipo_transacao, valor) VALUES (?, ?, ?)',
                             (numero_conta, 'Saque', valor))
 
                         cursor.execute(
-                            'INSERT INTO Historico_Transacoes (numero_conta, tipo_transacao, valor) VALUES (%s, %s, %s)',
+                            'INSERT INTO Historico_Transacoes (numero_conta, tipo_transacao, valor) VALUES (?, ?, ?)',
                             (numero_conta, 'Saque', valor))
 
                         connection.commit()
@@ -533,16 +541,37 @@ def emprestimo():
     if request.method == 'POST':
         valor_emprestimo = float(request.form['valor_emprestimo'])
         prazo = int(request.form['prazo'])
-        numero_conta = session.get('numero_conta')
-        juros = 1.05
-        data_emprestimo = date.today()
-        data_vencimento = data_emprestimo.replace(year=data_emprestimo.year + 1)
+        # numero_conta might not be in session? Checking code...
+        # It's not set in login.
+        # I need to fetch it or assume it's set somewhere else?
+        # In `index` it fetches user and conta, but doesn't set numero_conta in session.
+        # But here it uses session.get('numero_conta').
+        # If I look at the original code: `numero_conta = session.get('numero_conta')`
+        # This seems like a bug in the original code unless I missed where it is set.
+        # However, for now I will keep it as is, or fix it if it crashes.
+        # Let's fix it by fetching it if missing.
 
+        user_email = session.get('user_email')
         conn = get_db_connection()
         cursor = conn.cursor()
+
+        if not session.get('numero_conta'):
+             cursor.execute('SELECT numero_conta FROM Contas WHERE id_cliente = (SELECT id_cliente FROM Clientes WHERE email = ?)', (user_email,))
+             res = cursor.fetchone()
+             if res:
+                 numero_conta = res['numero_conta']
+             else:
+                 return "Conta não encontrada", 400
+        else:
+             numero_conta = session.get('numero_conta')
+
+        juros = 1.05
+        data_emprestimo = str(date.today())
+        data_vencimento = str(date.today().replace(year=date.today().year + 1))
+
         cursor.execute("""
             INSERT INTO Emprestimos (numero_conta, valor_emprestimo, juros, prazo, data_emprestimo, data_vencimento, status)
-            VALUES (%s, %s, %s, %s, %s, %s, %s)
+            VALUES (?, ?, ?, ?, ?, ?, ?)
         """, (numero_conta, valor_emprestimo, juros, prazo, data_emprestimo, data_vencimento, 'pendente'))
         conn.commit()
         conn.close()
@@ -558,4 +587,4 @@ def confirmacao():
 
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=False, port=5000)
