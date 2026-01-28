@@ -23,17 +23,24 @@
             </div>
         </div>
     </div>
-        <div class="account-balance">
-            <h2>Realizar Depósito</h2>
-            <section class="deposit-form-container">
-                <form id="depositoForm" action="{{ url_for('deposito') }}" method="post">
-                    <input type="text" name="valor" placeholder="Valor do Depósito" required>
-                    <button type="submit">Depositar</button>
-                </form>
-                <div id="message"></div>
-            </section>
+    <div class="account-balance">
+        <h2>Pagamento de Boleto</h2>
+        <form action="{{ url_for('main.pagamento_boleto') }}" method="post">
+            <label for="boleto-code">Código de Barras:</label>
+            <input type="text" id="boleto-code" name="boleto-code" placeholder="Digite o código de barras" required>
+
+            <label for="valor">Valor do Pagamento:</label>
+            <input type="number" id="valor" name="valor" step="0.01" min="0" required>
+
+            <label for="due-date">Data de Vencimento:</label>
+            <input type="date" id="due-date" name="due-date" required>
+
+            <button type="submit">Pagar Boleto</button>
+        </form>
     </div>
 
-    <script src="{{ url_for('static', filename='script.js') }}"></script>
+    {% if message %}
+        <p style="color: red;">{{ message }}</p>
+    {% endif %}
 </body>
 </html>
