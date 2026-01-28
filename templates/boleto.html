@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Thalium Bank - Histórico de Transações</title>
+    <title>Thalium Bank - Pagamento</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
 </head>
@@ -23,24 +23,37 @@
             </div>
         </div>
     </div>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <div class="flash-messages">
+          {% for category, message in messages %}
+            <div class="flash-message {{ category }}">
+              {{ message }}
+            </div>
+          {% endfor %}
+        </div>
+      {% endif %}
+    {% endwith %}
+
     <div class="account-balance">
         <h2>Pagamento de Boleto</h2>
-        <form action="{{ url_for('pagamento_boleto') }}" method="post">
-            <label for="boleto-code">Código de Barras:</label>
-            <input type="text" id="boleto-code" name="boleto-code" placeholder="Digite o código de barras" required>
+        <form action="{{ url_for('pagar') }}" method="post">
+            {{ form.hidden_tag() }}
 
-            <label for="valor">Valor do Pagamento:</label>
-            <input type="number" id="valor" name="valor" step="0.01" min="0" required>
+            <!-- Dummy fields for visual consistency if needed, but simplified to just Amount as per Form logic -->
+            <label>Código de Barras (Simulado)</label>
+            <input type="text" placeholder="Digite o código de barras" disabled>
 
-            <label for="due-date">Data de Vencimento:</label>
-            <input type="date" id="due-date" name="due-date" required>
+            <label for="amount">{{ form.amount.label }}</label>
+            {{ form.amount(step="0.01", min="0") }}
+             {% for error in form.amount.errors %}
+                <span style="color: red;">{{ error }}</span>
+            {% endfor %}
 
-            <button type="submit">Pagar Boleto</button>
+            {{ form.submit() }}
         </form>
     </div>
-
-    {% if message %}
-        <p style="color: red;">{{ message }}</p>
-    {% endif %}
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
 </body>
 </html>

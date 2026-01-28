@@ -23,22 +23,44 @@
             </div>
         </div>
     </div>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <div class="flash-messages">
+          {% for category, message in messages %}
+            <div class="flash-message {{ category }}">
+              {{ message }}
+            </div>
+          {% endfor %}
+        </div>
+      {% endif %}
+    {% endwith %}
+
     <div class="content">
         <div class="transfer-section">
             <h2>Transferir</h2>
             <form action="{{ url_for('transferir') }}" method="POST">
-                <label for="recipient">Destinatário</label>
-                <input type="text" id="recipient" name="recipient" placeholder="E-mail da conta" required>
+                {{ form.hidden_tag() }}
 
-                <label for="amount">Valor</label>
-                <input type="text" id="amount" name="amount" placeholder="R$ 0,00" required>
+                <label for="recipient">{{ form.recipient_email.label }}</label>
+                {{ form.recipient_email(placeholder="E-mail da conta") }}
+                {% for error in form.recipient_email.errors %}
+                    <span style="color: red;">{{ error }}</span>
+                {% endfor %}
 
-                <label for="description">Descrição</label>
-                <input type="text" id="description" name="description" placeholder="Descrição (opcional)">
+                <label for="amount">{{ form.amount.label }}</label>
+                {{ form.amount(placeholder="R$ 0,00") }}
+                {% for error in form.amount.errors %}
+                    <span style="color: red;">{{ error }}</span>
+                {% endfor %}
 
-                <button type="submit">Transferir</button>
+                <label for="description">{{ form.description.label }}</label>
+                {{ form.description(placeholder="Descrição (opcional)") }}
+
+                {{ form.submit() }}
             </form>
         </div>
     </div>
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
 </body>
 </html>

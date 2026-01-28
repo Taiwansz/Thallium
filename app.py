@@ -1,561 +1,304 @@
 from flask import Flask, render_template, request, redirect, url_for, session, flash, jsonify
-import mysql.connector
 from werkzeug.security import generate_password_hash, check_password_hash
-from datetime import date
+from flask_login import login_user, logout_user, login_required, current_user
+from config import Config
+from extensions import db, login_manager
+from models import Cliente, Conta, Cartao, Transacao, Emprestimo
+from forms import LoginForm, RegisterForm, TransferForm, DepositForm, WithdrawForm, BoletoForm, LoanForm
+from datetime import date, datetime, timedelta
 import random
 
+def create_app():
+    app = Flask(__name__)
+    app.config.from_object(Config)
 
-app = Flask(__name__)
-app.secret_key = 'sua_chave_secreta'
+    db.init_app(app)
+    login_manager.init_app(app)
+    login_manager.login_view = 'login'
 
-db_config = {
-    'user': 'tester6',
-    'password': '1233',
-    'host': 'localhost',
-    'database': 'thalium'
-}
+    return app
 
+app = create_app()
 
-def get_db_connection():
-    try:
-        connection = mysql.connector.connect(**db_config)
-        return connection
-    except mysql.connector.Error as err:
-        print(f"Error: {err}")
-        return None
-
+@login_manager.user_loader
+def load_user(user_id):
+    return db.session.get(Cliente, int(user_id))
 
 @app.route('/')
 def home():
-    return render_template('login.html')
-
-
-@app.route('/cadastrar_cliente', methods=['POST'])
-def cadastrar_cliente():
-    data = request.json
-    nome = data.get('nome')
-    cpf = data.get('cpf')
-    email = data.get('email')
-    senha = data.get('senha')
-
-    if not nome or not cpf or not email or not senha:
-        return jsonify({'message': 'Nome, CPF, email e senha são obrigatórios!'}), 400
-
-    # Hash da senha
-    senha_hash = generate_password_hash(senha)
-
-    connection = get_db_connection()
-    if connection is None:
-        return jsonify({'message': 'Erro na conexão com o banco de dados.'}), 500
-
-    cursor = connection.cursor()
-    try:
-        # Inserir o cliente
-        query = '''
-        INSERT INTO Clientes (nome, cpf, email, senha)
-        VALUES (%s, %s, %s, %s)
-        '''
-        cursor.execute(query, (nome, cpf, email, senha_hash))
-        connection.commit()
-
-        id_cliente = cursor.lastrowid
-        saldo_inicial = 0.00
-        tipo_conta = 'Corrente'
-        data_abertura = date.today()
-
-        query_conta = '''
-        INSERT INTO Contas (id_cliente, saldo, data_abertura, tipo_conta)
-        VALUES (%s, %s, %s, %s)
-        '''
-        cursor.execute(query_conta, (id_cliente, saldo_inicial, data_abertura, tipo_conta))
-        connection.commit()
-
-        def gerar_numero_cartao():
-            return ''.join([str(random.randint(0, 9)) for _ in range(16)])
-        numero_cartao = gerar_numero_cartao()
-        validade = f"{random.randint(1, 12):02d}/{random.randint(25, 30)}"
-        cvv = f"{random.randint(100, 999)}"
-
-        query_cartao = '''
-        INSERT INTO cartoes (numero, validade, cvv, id_cliente)
-        VALUES (%s, %s, %s, %s)
-        '''
-        cursor.execute(query_cartao, (numero_cartao, validade, cvv, id_cliente))
-        connection.commit()
-
-        return jsonify({
-            'message': 'Cliente, conta e cartão cadastrados com sucesso!',
-            'id_cliente': id_cliente,
-            'tipo_conta': tipo_conta,
-            'data_abertura': str(data_abertura),
-            'numero_cartao': numero_cartao,
-            'validade': validade,
-            'cvv': cvv
-        })
-
-    except mysql.connector.IntegrityError:
-        return jsonify({'message': 'Erro ao cadastrar: CPF ou email já existe.'}), 400
-    except Exception as e:
-        return jsonify({'message': f'Erro inesperado: {str(e)}'}), 500
-    finally:
-        cursor.close()
-        connection.close()
-
-
-@app.route('/index')
-def index():
-    if 'user_email' in session:
-        user_email = session['user_email']
-        connection = get_db_connection()
-        cursor = connection.cursor(dictionary=True)
-
-        try:
-            query = 'SELECT id_cliente FROM Clientes WHERE email = %s'
-            cursor.execute(query, (user_email,))
-            user = cursor.fetchone()
-
-            if user:
-                id_cliente = user['id_cliente']
-                query = 'SELECT saldo FROM Contas WHERE id_cliente = %s'
-                cursor.execute(query, (id_cliente,))
-                conta = cursor.fetchone()
-
-                if conta:
-                    saldo = conta['saldo']
-                else:
-                    saldo = 0.00
-            else:
-                saldo = 0.00
-
-            cursor.fetchall()
-        except Exception as e:
-            print(f"Erro ao buscar dados: {e}")
-            saldo = 0.00
-        finally:
-            cursor.close()
-            connection.close()
-
-        return render_template('index.html', saldo=saldo)
-    else:
-        return redirect(url_for('login'))
-
-
-@app.route('/extrato')
-def extrato():
-    return render_template('extrato.html')
-
-
-@app.route('/transfer', methods=['GET', 'POST'])
-def transferir():
-    if request.method == 'POST':
-        recipient_email = request.form.get('recipient')
-        amount = float(request.form.get('amount'))
-        description = request.form.get('description')
-
-        if amount <= 0:
-            return jsonify({'message': 'Valor de transferência deve ser positivo.'}), 400
-
-        connection = get_db_connection()
-        cursor = connection.cursor(dictionary=True)
-
-        try:
-
-            sender_email = session['user_email']
-            cursor.execute(
-                'SELECT numero_conta FROM Contas WHERE id_cliente = (SELECT id_cliente FROM Clientes WHERE email = %s)',
-                (sender_email,))
-            sender_account = cursor.fetchone()
-
-            if not sender_account:
-                return jsonify({'message': 'Conta do remetente não encontrada.'}), 404
-
-            cursor.execute(
-                'SELECT c.numero_conta FROM Contas c JOIN Clientes cl ON c.id_cliente = cl.id_cliente WHERE cl.email = %s',
-                (recipient_email,))
-            recipient_account = cursor.fetchone()
-
-            if not recipient_account:
-                return jsonify({'message': 'Destinatário não encontrado.'}), 404
-
-            cursor.execute('SELECT saldo FROM Contas WHERE numero_conta = %s', (sender_account['numero_conta'],))
-            sender_balance = cursor.fetchone()
-
-            if sender_balance['saldo'] < amount:
-                return jsonify({'message': 'Saldo insuficiente.'}), 400
-
-            cursor.execute('UPDATE Contas SET saldo = saldo - %s WHERE numero_conta = %s',
-                           (amount, sender_account['numero_conta']))
-            cursor.execute('UPDATE Contas SET saldo = saldo + %s WHERE numero_conta = %s',
-                           (amount, recipient_account['numero_conta']))
-
-            cursor.execute(
-                'INSERT INTO Transacoes (numero_conta, tipo_transacao, valor, descricao) VALUES (%s, %s, %s, %s)',
-                (sender_account['numero_conta'], 'Transferência', amount, description))
-
-            cursor.execute(
-                'INSERT INTO Historico_Transacoes (numero_conta, tipo_transacao, valor, descricao) VALUES (%s, %s, %s, %s)',
-                (sender_account['numero_conta'], 'Transferência', amount, description))
-
-            connection.commit()
-
-            cursor.execute('SELECT saldo FROM Contas WHERE numero_conta = %s', (sender_account['numero_conta'],))
-            novo_saldo = cursor.fetchone()['saldo']
-            print("Novo saldo do remetente:", novo_saldo)
-            return redirect(url_for('index'))
-
-        except Exception as e:
-            connection.rollback()
-            return jsonify({'message': 'Erro: ' + str(e)}), 500
-
-        finally:
-            cursor.close()
-            connection.close()
-    else:
-        return render_template('transfer.html')
-
-
-@app.route('/historico')
-def historico():
-    user_email = session.get('user_email')
-    if not user_email:
-        return jsonify({'message': 'Usuário não autenticado.'}), 401
-
-    connection = get_db_connection()
-    cursor = connection.cursor(dictionary=True)
-
-    try:
-        query = '''
-        SELECT numero_conta FROM Contas 
-        WHERE id_cliente = (SELECT id_cliente FROM Clientes WHERE email = %s)
-        '''
-        cursor.execute(query, (user_email,))
-        conta = cursor.fetchone()
-
-        if not conta:
-            return jsonify({'message': 'Conta não encontrada.'}), 404
-
-        numero_conta = conta['numero_conta']
-
-        query = '''
-        SELECT tipo_transacao, 
-            CASE 
-                WHEN tipo_transacao IN ('Saque', 'Transferência') THEN -valor 
-                ELSE valor 
-                END AS valor,
-                data_transacao, 
-                descricao
-        FROM (
-            SELECT tipo_transacao, valor, data_transacao, descricao FROM Transacoes WHERE numero_conta = %s
-            UNION  -- Mudança de UNION ALL para UNION
-            SELECT tipo_transacao, valor, data_transacao, descricao FROM Historico_Transacoes WHERE numero_conta = %s
-            ) AS todas_transacoes
-            ORDER BY data_transacao DESC
-
-        '''
-        cursor.execute(query, (numero_conta, numero_conta))
-        transacoes = cursor.fetchall()
-
-        return render_template('historico.html', transacoes=transacoes)
-
-    finally:
-        cursor.close()
-        connection.close()
-
-
-@app.route('/cadastro')
-def cadastro():
-    return render_template('register.html')
-
-
-@app.route('/boleto')
-def pagar():
-    return render_template('boleto.html')
-
-
-@app.route('/pagamento_boleto', methods=['POST'])
-def pagamento_boleto():
-    if request.method == 'POST':
-        valor = request.form['valor']
-        try:
-            valor = float(valor)
-            if valor <= 0:
-                return jsonify({'message': 'O valor deve ser maior que zero.'}), 400
-        except ValueError:
-            return jsonify({'message': 'Valor inválido.'}), 400
-
-        user_email = session.get('user_email')
-        connection = get_db_connection()
-        cursor = connection.cursor(dictionary=True)
-
-        try:
-            cursor.execute('SELECT id_cliente FROM Clientes WHERE email = %s', (user_email,))
-            user = cursor.fetchone()
-
-            if user:
-                cursor.execute('SELECT numero_conta, saldo FROM Contas WHERE id_cliente = %s', (user['id_cliente'],))
-                conta = cursor.fetchone()
-
-                if conta:
-                    numero_conta = conta['numero_conta']
-                    saldo_atual = conta['saldo']
-
-                    # Verifica se o saldo é suficiente para o pagamento
-                    if saldo_atual >= valor:
-                        # Atualiza o saldo da conta
-                        cursor.execute('UPDATE Contas SET saldo = saldo - %s WHERE numero_conta = %s',
-                                       (valor, numero_conta))
-                        connection.commit()
-
-                        # Agora, registra a transação no histórico
-                        cursor.execute(
-                            'INSERT INTO Historico_Transacoes (numero_conta, tipo_transacao, valor) VALUES (%s, %s, %s)',
-                            (numero_conta, 'Pagamento Boleto', -valor))  # Registrando como valor negativo
-
-                        connection.commit()
-
-                        return redirect(url_for('index'))
-                    else:
-                        return jsonify({'message': 'Saldo insuficiente para o pagamento.'}), 400
-                else:
-                    return jsonify({'message': 'Conta não encontrada.'}), 404
-            else:
-                return jsonify({'message': 'Usuário não encontrado.'}), 404
-
-        finally:
-            cursor.close()
-            connection.close()
-
-    return render_template('pagamento_boleto.html')
-
-
-@app.route('/sucesso')
-def sucesso():
-    return "Boleto pago com sucesso!"
-
+    if current_user.is_authenticated:
+        return redirect(url_for('index'))
+    return redirect(url_for('login'))
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
-    if request.method == 'POST':
-        email = request.form['email']
-        password = request.form['password']
+    if current_user.is_authenticated:
+        return redirect(url_for('index'))
 
-        connection = get_db_connection()
-        if connection is None:
-            flash('Erro na conexão com o banco de dados.', 'error')
-            return render_template('login.html')
-
-        cursor = connection.cursor(dictionary=True)
-        try:
-            query = 'SELECT id_cliente, nome, senha FROM Clientes WHERE email = %s'
-            cursor.execute(query, (email,))
-            user = cursor.fetchone()
-
-            cursor.fetchall()  # Garantir que qualquer resultado pendente seja consumido
-
-            if user is None:
-                flash('Usuário não encontrado.', 'error')
-                return render_template('login.html')
-
-            if not check_password_hash(user['senha'], password):
-                flash('Senha incorreta.', 'error')
-                return render_template('login.html')
-
-            session['user_email'] = email
-            session['username'] = user['nome']
-            session['id_cliente'] = user['id_cliente']
+    form = LoginForm()
+    if form.validate_on_submit():
+        user = Cliente.query.filter_by(email=form.email.data).first()
+        if user and check_password_hash(user.senha, form.password.data):
+            login_user(user)
             return redirect(url_for('index'))
-        finally:
-            cursor.close()
-            connection.close()
-    else:
-        return render_template('login.html')
+        else:
+            flash('Login ou senha inválidos.', 'error')
 
-
-@app.route('/saldo/<int:numero_conta>', methods=['GET'])
-def saldo(numero_conta):
-    connection = get_db_connection()
-    if connection is None:
-        return jsonify({'message': 'Erro na conexão com o banco de dados.'}), 500
-
-    cursor = connection.cursor(dictionary=True)
-    try:
-        query = 'SELECT saldo FROM Contas WHERE numero_conta = %s'
-        cursor.execute(query, (numero_conta,))
-        result = cursor.fetchone()
-    finally:
-        cursor.close()
-        connection.close()
-
-    return jsonify(result if result else {'message': 'Conta não encontrada.'})
-
-
-@app.route('/deposito', methods=['GET', 'POST'])
-def deposito():
-    if request.method == 'POST':
-        valor = request.form['valor']
-        try:
-            valor = float(valor)
-            if valor <= 0:
-                return jsonify({'message': 'O valor deve ser maior que zero.'}), 400
-        except ValueError:
-            return jsonify({'message': 'Valor inválido.'}), 400
-
-        user_email = session.get('user_email')
-        connection = get_db_connection()
-        cursor = connection.cursor(dictionary=True)
-
-        try:
-            cursor.execute('SELECT id_cliente FROM Clientes WHERE email = %s', (user_email,))
-            user = cursor.fetchone()
-
-            if user:
-                cursor.execute('SELECT numero_conta FROM Contas WHERE id_cliente = %s', (user['id_cliente'],))
-                conta = cursor.fetchone()
-
-                if conta:
-                    numero_conta = conta['numero_conta']
-                    cursor.execute('UPDATE Contas SET saldo = saldo + %s WHERE numero_conta = %s',
-                                   (valor, numero_conta))
-                    connection.commit()
-
-                    cursor.execute(
-                        'INSERT INTO Transacoes (numero_conta, tipo_transacao, valor) VALUES (%s, %s, %s)',
-                        (numero_conta, 'Depósito', valor))
-
-                    cursor.execute(
-                        'INSERT INTO Historico_Transacoes (numero_conta, tipo_transacao, valor) VALUES (%s, %s, %s)',
-                        (numero_conta, 'Depósito', valor))
-
-                    connection.commit()
-                    return redirect(url_for('index'))
-                else:
-                    return jsonify({'message': 'Conta não encontrada.'}), 404
-            else:
-                return jsonify({'message': 'Usuário não encontrado.'}), 404
-
-        finally:
-            cursor.close()
-            connection.close()
-
-    return render_template('deposito.html')
-
-
-@app.route('/cartoes')
-def cartoes():
-    if 'id_cliente' not in session:
-        print("Usuário não logado, redirecionando para login...")
-        return redirect(url_for('login_post'))
-
-    id_cliente = session['id_cliente']
-    print(f"Usuário logado, id_cliente: {id_cliente}")
-    conn = get_db_connection()
-    cursor = conn.cursor(dictionary=True)
-    cursor.execute("SELECT * FROM cartoes WHERE id_cliente = %s", (id_cliente,))
-    cartoes = cursor.fetchall()
-
-    if cartoes:
-        print("Cartões encontrados:", cartoes)
-    else:
-        print("Nenhum cartão encontrado para esse usuário.")
-
-    return render_template('cartoes.html', cartoes=cartoes)
-
-
-@app.route('/erro')
-def pagina_erro():
-    return "Nenhum cartão encontrado para o cliente."
-
+    return render_template('login.html', form=form)
 
 @app.route('/logout')
+@login_required
 def logout():
-    session.clear()
+    logout_user()
     return redirect(url_for('login'))
 
+@app.route('/cadastro', methods=['GET', 'POST'])
+def cadastro():
+    if current_user.is_authenticated:
+        return redirect(url_for('index'))
+
+    form = RegisterForm()
+    if form.validate_on_submit():
+        hashed_password = generate_password_hash(form.password.data)
+        cliente = Cliente(
+            nome=form.nome.data,
+            cpf=form.cpf.data,
+            email=form.email.data,
+            senha=hashed_password
+        )
+        db.session.add(cliente)
+        db.session.commit()
+
+        # Create Account
+        conta = Conta(
+            id_cliente=cliente.id_cliente,
+            tipo_conta='Corrente',
+            data_abertura=date.today(),
+            saldo=0.00
+        )
+        db.session.add(conta)
+        db.session.commit()
+
+        # Create Card
+        def gerar_numero_cartao():
+            return ''.join([str(random.randint(0, 9)) for _ in range(16)])
+
+        numero_cartao = gerar_numero_cartao()
+        while Cartao.query.filter_by(numero=numero_cartao).first():
+             numero_cartao = gerar_numero_cartao()
+
+        validade = f"{random.randint(1, 12):02d}/{random.randint(25, 30)}"
+        cvv = f"{random.randint(100, 999)}"
+
+        cartao = Cartao(
+            numero=numero_cartao,
+            validade=validade,
+            cvv=cvv,
+            id_cliente=cliente.id_cliente
+        )
+        db.session.add(cartao)
+        db.session.commit()
+
+        flash('Conta criada com sucesso! Faça login.', 'success')
+        return redirect(url_for('login'))
+
+    return render_template('register.html', form=form)
+
+@app.route('/index')
+@login_required
+def index():
+    conta = Conta.query.filter_by(id_cliente=current_user.id_cliente).first()
+    saldo = conta.saldo if conta else 0.00
+    return render_template('index.html', saldo=saldo)
+
+@app.route('/extrato')
+@login_required
+def extrato():
+    conta = Conta.query.filter_by(id_cliente=current_user.id_cliente).first()
+    if not conta:
+        flash('Conta não encontrada.', 'error')
+        return redirect(url_for('index'))
+
+    transacoes = Transacao.query.filter_by(numero_conta=conta.numero_conta).order_by(Transacao.data_transacao.desc()).all()
+    return render_template('historico.html', transacoes=transacoes)
+
+@app.route('/transfer', methods=['GET', 'POST'])
+@login_required
+def transferir():
+    form = TransferForm()
+    if form.validate_on_submit():
+        recipient = Cliente.query.filter_by(email=form.recipient_email.data).first()
+        if not recipient:
+            flash('Destinatário não encontrado.', 'error')
+            return render_template('transfer.html', form=form)
+
+        sender_conta = Conta.query.filter_by(id_cliente=current_user.id_cliente).first()
+        recipient_conta = Conta.query.filter_by(id_cliente=recipient.id_cliente).first()
+
+        if not recipient_conta:
+             flash('Conta do destinatário não encontrada.', 'error')
+             return render_template('transfer.html', form=form)
+
+        if sender_conta.saldo < form.amount.data:
+            flash('Saldo insuficiente.', 'error')
+            return render_template('transfer.html', form=form)
+
+        try:
+            sender_conta.saldo = float(sender_conta.saldo) - float(form.amount.data)
+            recipient_conta.saldo = float(recipient_conta.saldo) + float(form.amount.data)
+
+            transacao_sender = Transacao(
+                numero_conta=sender_conta.numero_conta,
+                tipo_transacao='Transferência Enviada',
+                valor=-form.amount.data,
+                descricao=f"Para: {recipient.email} - {form.description.data or ''}"
+            )
+
+            transacao_recipient = Transacao(
+                numero_conta=recipient_conta.numero_conta,
+                tipo_transacao='Transferência Recebida',
+                valor=form.amount.data,
+                descricao=f"De: {current_user.email} - {form.description.data or ''}"
+            )
+
+            db.session.add(transacao_sender)
+            db.session.add(transacao_recipient)
+            db.session.commit()
+
+            flash('Transferência realizada com sucesso!', 'success')
+            return redirect(url_for('index'))
+        except Exception as e:
+            db.session.rollback()
+            flash(f'Erro na transferência: {str(e)}', 'error')
+
+    return render_template('transfer.html', form=form)
+
+@app.route('/boleto', methods=['GET', 'POST'])
+@login_required
+def pagar():
+    form = BoletoForm()
+    if form.validate_on_submit():
+        conta = Conta.query.filter_by(id_cliente=current_user.id_cliente).first()
+        if conta.saldo < form.amount.data:
+            flash('Saldo insuficiente.', 'error')
+        else:
+            try:
+                conta.saldo = float(conta.saldo) - float(form.amount.data)
+                transacao = Transacao(
+                    numero_conta=conta.numero_conta,
+                    tipo_transacao='Pagamento Boleto',
+                    valor=-form.amount.data,
+                    descricao='Pagamento de Boleto'
+                )
+                db.session.add(transacao)
+                db.session.commit()
+                flash('Boleto pago com sucesso!', 'success')
+                return redirect(url_for('index'))
+            except Exception as e:
+                db.session.rollback()
+                flash(f'Erro: {str(e)}', 'error')
+
+    return render_template('boleto.html', form=form)
+
+@app.route('/pagamento_boleto', methods=['POST'])
+@login_required
+def pagamento_boleto():
+    return redirect(url_for('pagar'))
+
+@app.route('/deposito', methods=['GET', 'POST'])
+@login_required
+def deposito():
+    form = DepositForm()
+    if form.validate_on_submit():
+        conta = Conta.query.filter_by(id_cliente=current_user.id_cliente).first()
+        try:
+            conta.saldo = float(conta.saldo) + float(form.amount.data)
+            transacao = Transacao(
+                numero_conta=conta.numero_conta,
+                tipo_transacao='Depósito',
+                valor=form.amount.data,
+                descricao='Depósito realizado'
+            )
+            db.session.add(transacao)
+            db.session.commit()
+            flash('Depósito realizado com sucesso!', 'success')
+            return redirect(url_for('index'))
+        except Exception as e:
+             db.session.rollback()
+             flash(f'Erro: {str(e)}', 'error')
+
+    return render_template('deposito.html', form=form)
 
 @app.route('/saque', methods=['GET', 'POST'])
+@login_required
 def saque():
-    if request.method == 'POST':
-        valor = request.form['valor']
-        try:
-            valor = float(valor)
-            if valor <= 0:
-                return jsonify({'message': 'O valor deve ser maior que zero.'}), 400
-        except ValueError:
-            return jsonify({'message': 'Valor inválido.'}), 400
+    form = WithdrawForm()
+    if form.validate_on_submit():
+        conta = Conta.query.filter_by(id_cliente=current_user.id_cliente).first()
+        if conta.saldo < form.amount.data:
+            flash('Saldo insuficiente.', 'error')
+        else:
+            try:
+                conta.saldo = float(conta.saldo) - float(form.amount.data)
+                transacao = Transacao(
+                    numero_conta=conta.numero_conta,
+                    tipo_transacao='Saque',
+                    valor=-form.amount.data,
+                    descricao='Saque realizado'
+                )
+                db.session.add(transacao)
+                db.session.commit()
+                flash('Saque realizado com sucesso!', 'success')
+                return redirect(url_for('index'))
+            except Exception as e:
+                db.session.rollback()
+                flash(f'Erro: {str(e)}', 'error')
 
-        user_email = session.get('user_email')
-        connection = get_db_connection()
-        cursor = connection.cursor(dictionary=True)
-
-        try:
-            cursor.execute('SELECT id_cliente FROM Clientes WHERE email = %s', (user_email,))
-            user = cursor.fetchone()
-
-            if user:
-                cursor.execute('SELECT numero_conta, saldo FROM Contas WHERE id_cliente = %s', (user['id_cliente'],))
-                conta = cursor.fetchone()
-
-                if conta:
-                    numero_conta = conta['numero_conta']
-                    saldo_atual = conta['saldo']
-
-                    if saldo_atual >= valor:
-                        cursor.execute('UPDATE Contas SET saldo = saldo - %s WHERE numero_conta = %s',
-                                       (valor, numero_conta))
-                        connection.commit()
-
-                        cursor.execute(
-                            'INSERT INTO Transacoes (numero_conta, tipo_transacao, valor) VALUES (%s, %s, %s)',
-                            (numero_conta, 'Saque', valor))
-
-                        cursor.execute(
-                            'INSERT INTO Historico_Transacoes (numero_conta, tipo_transacao, valor) VALUES (%s, %s, %s)',
-                            (numero_conta, 'Saque', valor))
-
-                        connection.commit()
-                        return redirect(url_for('index'))
-                    else:
-                        return jsonify({'message': 'Saldo insuficiente.'}), 400
-                else:
-                    return jsonify({'message': 'Conta não encontrada.'}), 404
-            else:
-                return jsonify({'message': 'Usuário não encontrado.'}), 404
-
-        finally:
-            cursor.close()
-            connection.close()
-
-    return render_template('saque.html')
-
+    return render_template('saque.html', form=form)
 
 @app.route('/emprestimo', methods=['GET', 'POST'])
+@login_required
 def emprestimo():
-    if request.method == 'POST':
-        valor_emprestimo = float(request.form['valor_emprestimo'])
-        prazo = int(request.form['prazo'])
-        numero_conta = session.get('numero_conta')
+    form = LoanForm()
+    if form.validate_on_submit():
+        conta = Conta.query.filter_by(id_cliente=current_user.id_cliente).first()
         juros = 1.05
-        data_emprestimo = date.today()
-        data_vencimento = data_emprestimo.replace(year=data_emprestimo.year + 1)
+        data_emp = date.today()
+        data_venc = data_emp + timedelta(days=30*form.prazo.data)
 
-        conn = get_db_connection()
-        cursor = conn.cursor()
-        cursor.execute("""
-            INSERT INTO Emprestimos (numero_conta, valor_emprestimo, juros, prazo, data_emprestimo, data_vencimento, status)
-            VALUES (%s, %s, %s, %s, %s, %s, %s)
-        """, (numero_conta, valor_emprestimo, juros, prazo, data_emprestimo, data_vencimento, 'pendente'))
-        conn.commit()
-        conn.close()
-
+        emp = Emprestimo(
+            numero_conta=conta.numero_conta,
+            valor_emprestimo=form.amount.data,
+            juros=juros,
+            prazo=form.prazo.data,
+            data_emprestimo=data_emp,
+            data_vencimento=data_venc,
+            status='pendente'
+        )
+        db.session.add(emp)
+        db.session.commit()
         return redirect(url_for('confirmacao'))
 
-    return render_template('emprestimo.html')
-
+    return render_template('emprestimo.html', form=form)
 
 @app.route('/emprestimo/confirmacao')
+@login_required
 def confirmacao():
     return render_template('confirmacao.html', mensagem="Seu pedido de empréstimo foi enviado com sucesso!")
 
+@app.route('/cartoes')
+@login_required
+def cartoes():
+    cartoes_list = Cartao.query.filter_by(id_cliente=current_user.id_cliente).all()
+    return render_template('cartoes.html', cartoes=cartoes_list)
+
+@app.route('/sucesso')
+def sucesso():
+    return "Ação realizada com sucesso!"
+
+@app.route('/erro')
+def pagina_erro():
+    return "Ocorreu um erro."
 
 if __name__ == '__main__':
     app.run(debug=True)

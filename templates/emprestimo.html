@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Thalium Bank - Histórico de Transações</title>
+    <title>Thalium Bank - Empréstimo</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
 </head>
@@ -23,19 +23,41 @@
             </div>
         </div>
     </div>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <div class="flash-messages">
+          {% for category, message in messages %}
+            <div class="flash-message {{ category }}">
+              {{ message }}
+            </div>
+          {% endfor %}
+        </div>
+      {% endif %}
+    {% endwith %}
+
     <div class="container">
         <h2>Solicitar Empréstimo</h2>
-        <form action="/emprestimo" method="POST">
+        <form action="{{ url_for('emprestimo') }}" method="POST">
+            {{ form.hidden_tag() }}
+
             <div class="form-group">
-                <label for="valor_emprestimo">Valor do Empréstimo</label>
-                <input type="number" id="valor_emprestimo" name="valor_emprestimo" required>
+                <label for="amount">{{ form.amount.label }}</label>
+                {{ form.amount() }}
+                {% for error in form.amount.errors %}
+                    <span style="color: red;">{{ error }}</span>
+                {% endfor %}
             </div>
             <div class="form-group">
-                <label for="prazo">Prazo (meses)</label>
-                <input type="number" id="prazo" name="prazo" required>
+                <label for="prazo">{{ form.prazo.label }}</label>
+                {{ form.prazo() }}
+                 {% for error in form.prazo.errors %}
+                    <span style="color: red;">{{ error }}</span>
+                {% endfor %}
             </div>
-            <button type="submit">Solicitar Empréstimo</button>
+            {{ form.submit() }}
         </form>
     </div>
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
 </body>
 </html>
