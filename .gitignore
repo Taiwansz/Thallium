@@ -1,0 +1,4 @@
+thalium.db
+flask.log
+__pycache__/
+*.pyc
