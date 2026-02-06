@@ -16,9 +16,26 @@
                     <input type="number" step="0.01" class="form-control" id="amount" name="amount" required>
                 </div>
                 <div class="form-group">
+                    <label for="category">Categoria</label>
+                    <select class="form-control" id="category" name="category">
+                        <option value="Outros">Outros</option>
+                        <option value="Alimentação">Alimentação</option>
+                        <option value="Transporte">Transporte</option>
+                        <option value="Lazer">Lazer</option>
+                        <option value="Saúde">Saúde</option>
+                        <option value="Moradia">Moradia</option>
+                    </select>
+                </div>
+                <div class="form-group">
                     <label for="description">Descrição</label>
                     <input type="text" class="form-control" id="description" name="description" placeholder="Opcional">
                 </div>
+                {% if current_user.senha_transacao %}
+                <div class="form-group">
+                    <label for="pin">Senha de Transação (4 dígitos)</label>
+                    <input type="password" class="form-control" id="pin" name="pin" maxlength="4" required>
+                </div>
+                {% endif %}
                 <button type="submit" class="btn btn-primary btn-block">Transferir</button>
             </form>
             <div class="text-center mt-3">

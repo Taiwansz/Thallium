@@ -1,0 +1,116 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-12 mb-4">
+        <div class="content-card text-center" style="background: linear-gradient(135deg, #32bcad 0%, #203763 100%); color: white;">
+            <i class="fas fa-qrcode fa-3x mb-3"></i>
+            <h2>Área Pix</h2>
+            <p>Simples, rápido e seguro.</p>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-6 mb-4">
+        <div class="content-card h-100">
+            <h4><i class="fas fa-key"></i> Minhas Chaves</h4>
+
+            {% if chaves %}
+                <ul class="list-group list-group-flush mb-3">
+                {% for chave in chaves %}
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        <div>
+                            <span class="badge badge-info">{{ chave.tipo | upper }}</span><br>
+                            <small class="text-muted">{{ chave.chave }}</small>
+                        </div>
+                        <i class="fas fa-check-circle text-success"></i>
+                    </li>
+                {% endfor %}
+                </ul>
+            {% else %}
+                <p class="text-muted">Você ainda não tem chaves cadastradas.</p>
+            {% endif %}
+
+            <button class="btn btn-outline-primary btn-block" type="button" data-toggle="collapse" data-target="#cadastroChave">
+                + Cadastrar Nova Chave
+            </button>
+
+            <div class="collapse mt-3" id="cadastroChave">
+                <form action="{{ url_for('pix.cadastrar_chave') }}" method="POST">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                    <div class="form-group">
+                        <select class="form-control" name="tipo" id="tipoChave" onchange="toggleChaveInput()">
+                            <option value="">Selecione o tipo...</option>
+                            <option value="cpf">CPF</option>
+                            <option value="email">E-mail</option>
+                            <option value="aleatoria">Chave Aleatória</option>
+                        </select>
+                    </div>
+                    <div class="form-group" id="inputChaveGroup" style="display:none;">
+                        <input type="text" class="form-control" name="chave" id="valorChave" placeholder="Digite a chave">
+                    </div>
+                    <button type="submit" class="btn btn-success btn-block">Salvar Chave</button>
+                </form>
+            </div>
+
+        </div>
+    </div>
+
+    <div class="col-md-6 mb-4">
+        <div class="content-card h-100">
+            <h4><i class="fas fa-paper-plane"></i> Pagar / Transferir</h4>
+            <div class="list-group">
+                <a href="{{ url_for('pix.pagar') }}" class="list-group-item list-group-item-action">
+                    <div class="d-flex w-100 justify-content-between">
+                        <h5 class="mb-1">Pagar com Chave</h5>
+                        <i class="fas fa-keyboard"></i>
+                    </div>
+                    <small>CPF, E-mail, Celular ou Aleatória</small>
+                </a>
+                <a href="#" class="list-group-item list-group-item-action" onclick="alert('Funcionalidade de leitura de QR Code simulada!')">
+                    <div class="d-flex w-100 justify-content-between">
+                        <h5 class="mb-1">Ler QR Code</h5>
+                        <i class="fas fa-camera"></i>
+                    </div>
+                    <small>Utilize a câmera do celular</small>
+                </a>
+                 <a href="#" class="list-group-item list-group-item-action" onclick="alert('Funcionalidade Pix Copia e Cola simulada!')">
+                    <div class="d-flex w-100 justify-content-between">
+                        <h5 class="mb-1">Pix Copia e Cola</h5>
+                        <i class="fas fa-paste"></i>
+                    </div>
+                    <small>Cole o código aqui</small>
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="text-center">
+    <a href="{{ url_for('index') }}" class="btn btn-secondary">Voltar ao Início</a>
+</div>
+
+<script>
+    function toggleChaveInput() {
+        var tipo = document.getElementById('tipoChave').value;
+        var inputGroup = document.getElementById('inputChaveGroup');
+        var input = document.getElementById('valorChave');
+
+        if (tipo === 'aleatoria') {
+            inputGroup.style.display = 'none';
+        } else if (tipo) {
+            inputGroup.style.display = 'block';
+            if(tipo === 'cpf') {
+                 $(input).inputmask("999.999.999-99");
+                 input.placeholder = "000.000.000-00";
+            } else {
+                 $(input).inputmask('remove');
+                 input.placeholder = "Digite seu " + tipo;
+            }
+        } else {
+            inputGroup.style.display = 'none';
+        }
+    }
+</script>
+{% endblock %}

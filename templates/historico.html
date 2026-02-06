@@ -24,6 +24,11 @@
                             <td class="text-right {{ 'text-success' if transacao.valor > 0 else 'text-danger' }}">
                                 <strong>{{ '+' if transacao.valor > 0 else '' }} {{ transacao.valor | currency }}</strong>
                             </td>
+                            <td class="text-center">
+                                <a href="{{ url_for('download_recibo', id_transacao=transacao.id_transacao) }}" class="btn btn-sm btn-outline-info" title="Baixar Comprovante">
+                                    <i class="fas fa-file-pdf"></i>
+                                </a>
+                            </td>
                         </tr>
                         {% endfor %}
                     </tbody>

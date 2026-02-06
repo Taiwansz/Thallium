@@ -21,6 +21,12 @@
                 </div>
                 <button type="submit" class="btn btn-primary btn-block">Salvar Alterações</button>
             </form>
+
+            <hr>
+            <h4 class="text-center mt-4">Segurança</h4>
+            <a href="{{ url_for('config_senha_transacao') }}" class="btn btn-outline-info btn-block">
+                <i class="fas fa-key"></i> {{ 'Alterar' if user.senha_transacao else 'Configurar' }} Senha de Transação
+            </a>
             <div class="text-center mt-3">
                  <a href="{{ url_for('index') }}" class="btn btn-secondary">Voltar</a>
             </div>

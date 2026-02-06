@@ -14,9 +14,11 @@ class Cliente(db.Model, UserMixin):
     email = db.Column(db.String(100), unique=True)
     cpf = db.Column(db.String(11), unique=True, nullable=False)
     senha = db.Column(db.String(255), nullable=False)
+    senha_transacao = db.Column(db.String(255), nullable=True) # 4-digit PIN
 
     contas = relationship('Conta', backref='cliente', lazy=True)
     cartoes = relationship('Cartao', backref='cliente', lazy=True)
+    chaves_pix = relationship('ChavePix', backref='cliente', lazy=True)
 
 class Conta(db.Model):
     __tablename__ = 'Contas'
@@ -37,6 +39,7 @@ class Transacao(db.Model):
     valor = db.Column(db.Numeric(15, 2), nullable=False)
     data_transacao = db.Column(db.DateTime, default=datetime.utcnow)
     descricao = db.Column(db.String(255))
+    categoria = db.Column(db.String(50), default='Outros')
 
 class Emprestimo(db.Model):
     __tablename__ = 'Emprestimos'
@@ -56,3 +59,11 @@ class Cartao(db.Model):
     validade = db.Column(db.String(5), nullable=False)
     cvv = db.Column(db.String(3), nullable=False)
     id_cliente = db.Column(db.Integer, ForeignKey('Clientes.id_cliente'))
+    bloqueado = db.Column(db.Boolean, default=False)
+
+class ChavePix(db.Model):
+    __tablename__ = 'chaves_pix'
+    id = db.Column(db.Integer, primary_key=True)
+    tipo = db.Column(db.String(20), nullable=False) # cpf, email, aleatoria
+    chave = db.Column(db.String(100), unique=True, nullable=False)
+    id_cliente = db.Column(db.Integer, ForeignKey('Clientes.id_cliente', ondelete='CASCADE'))

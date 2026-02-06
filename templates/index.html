@@ -4,8 +4,13 @@
 <div class="row">
     <div class="col-md-12">
         <div class="content-card mb-4 text-center">
-            <h2>Conta Corrente</h2>
-            <div class="display-4 my-3">{{ saldo | currency }}</div>
+            <div class="d-flex justify-content-center align-items-center">
+                <h2 class="mr-3">Conta Corrente</h2>
+                <button class="btn btn-sm btn-outline-secondary" onclick="toggleBalance()">
+                    <i id="toggle-eye" class="fas fa-eye"></i>
+                </button>
+            </div>
+            <div class="display-4 my-3 balance-value" data-value="{{ saldo | currency }}">{{ saldo | currency }}</div>
             {% if saldo == 0 %}
                 <p class="text-muted">Seu saldo está zerado.</p>
             {% endif %}
@@ -18,6 +23,11 @@
         <div class="content-card">
             <h4 class="mb-4">Ações Rápidas</h4>
             <div class="row text-center">
+                <div class="col-6 col-md-4 col-lg-2 mb-3">
+                    <a href="{{ url_for('pix.dashboard') }}" class="btn btn-outline-success btn-block p-3">
+                        <i class="fab fa-pix fa-2x mb-2"></i><br>Pix
+                    </a>
+                </div>
                 <div class="col-6 col-md-4 col-lg-2 mb-3">
                     <a href="{{ url_for('pagar') }}" class="btn btn-outline-primary btn-block p-3">
                         <i class="fas fa-barcode fa-2x mb-2"></i><br>Pagar

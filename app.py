@@ -5,10 +5,11 @@ import random
 from decimal import Decimal
 from extensions import db
 from config import Config
-from models import Cliente, Conta, Transacao, Emprestimo, Cartao
+from models import Cliente, Conta, Transacao, Emprestimo, Cartao, ChavePix
 from flask_login import LoginManager, login_user, login_required, logout_user, current_user
 from sqlalchemy.exc import IntegrityError
 from flask_wtf.csrf import CSRFProtect
+from utils import gerar_recibo_pdf
 
 app = Flask(__name__)
 app.config.from_object(Config)
@@ -18,6 +19,9 @@ db.init_app(app)
 login_manager = LoginManager()
 login_manager.init_app(app)
 login_manager.login_view = 'login'
+
+from routes_pix import pix_bp
+app.register_blueprint(pix_bp)
 
 @login_manager.user_loader
 def load_user(user_id):
@@ -171,10 +175,18 @@ def transferir():
             return redirect(url_for('transferir'))
 
         description = request.form.get('description')
+        category = request.form.get('category', 'Outros')
 
         if amount <= 0:
             flash('Valor de transferência deve ser positivo.', 'error')
             return redirect(url_for('transferir'))
+
+        # Verify Transaction Password if set
+        if current_user.senha_transacao:
+            pin = request.form.get('pin')
+            if not pin or not check_password_hash(current_user.senha_transacao, pin):
+                 flash('Senha de transação incorreta.', 'error')
+                 return redirect(url_for('transferir'))
 
         sender_account = Conta.query.filter_by(id_cliente=current_user.id_cliente).first()
         if not sender_account:
@@ -204,14 +216,16 @@ def transferir():
                 numero_conta=sender_account.numero_conta,
                 tipo_transacao='Transferência Enviada',
                 valor=-amount,
-                descricao=f"Para {recipient_client.nome}: {description}"
+                descricao=f"Para {recipient_client.nome}: {description}",
+                categoria=category
             )
             # Transação de entrada (Destinatário)
             tx_in = Transacao(
                 numero_conta=recipient_account.numero_conta,
                 tipo_transacao='Transferência Recebida',
                 valor=amount,
-                descricao=f"De {current_user.nome}: {description}"
+                descricao=f"De {current_user.nome}: {description}",
+                categoria='Transferência'
             )
 
             db.session.add(tx_out)
@@ -245,10 +259,41 @@ def historico():
     transacoes = pagination.items
     return render_template('historico.html', transacoes=transacoes, pagination=pagination)
 
+@app.route('/recibo/<int:id_transacao>')
+@login_required
+def download_recibo(id_transacao):
+    conta = Conta.query.filter_by(id_cliente=current_user.id_cliente).first()
+    transacao = Transacao.query.filter_by(id_transacao=id_transacao, numero_conta=conta.numero_conta).first()
+
+    if not transacao:
+        flash('Transação não encontrada.', 'error')
+        return redirect(url_for('historico'))
+
+    return gerar_recibo_pdf(transacao, current_user)
+
 
 @app.route('/cadastro')
 def cadastro():
     return render_template('register.html')
+
+@app.route('/config_senha_transacao', methods=['GET', 'POST'])
+@login_required
+def config_senha_transacao():
+    if request.method == 'POST':
+        pin = request.form.get('pin')
+        confirm_pin = request.form.get('confirm_pin')
+
+        if not pin or not pin.isdigit() or len(pin) != 4:
+             flash('A senha deve conter exatamente 4 dígitos numéricos.', 'error')
+        elif pin != confirm_pin:
+             flash('As senhas não conferem.', 'error')
+        else:
+            current_user.senha_transacao = generate_password_hash(pin)
+            db.session.commit()
+            flash('Senha de transação configurada com sucesso!', 'success')
+            return redirect(url_for('perfil'))
+
+    return render_template('config_senha_transacao.html')
 
 @app.route('/perfil', methods=['GET', 'POST'])
 @login_required
@@ -390,6 +435,30 @@ def deposito():
 def cartoes():
     cartoes_list = Cartao.query.filter_by(id_cliente=current_user.id_cliente).all()
     return render_template('cartoes.html', cartoes=cartoes_list)
+
+@app.route('/cartoes/bloquear/<int:id_cartao>', methods=['POST'])
+@login_required
+def bloquear_cartao(id_cartao):
+    cartao = Cartao.query.filter_by(id=id_cartao, id_cliente=current_user.id_cliente).first()
+    if cartao:
+        cartao.bloqueado = True
+        db.session.commit()
+        flash('Cartão bloqueado com sucesso.', 'success')
+    else:
+        flash('Cartão não encontrado.', 'error')
+    return redirect(url_for('cartoes'))
+
+@app.route('/cartoes/desbloquear/<int:id_cartao>', methods=['POST'])
+@login_required
+def desbloquear_cartao(id_cartao):
+    cartao = Cartao.query.filter_by(id=id_cartao, id_cliente=current_user.id_cliente).first()
+    if cartao:
+        cartao.bloqueado = False
+        db.session.commit()
+        flash('Cartão desbloqueado com sucesso.', 'success')
+    else:
+        flash('Cartão não encontrado.', 'error')
+    return redirect(url_for('cartoes'))
 
 
 @app.route('/erro')

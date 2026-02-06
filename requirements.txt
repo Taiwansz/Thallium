@@ -5,3 +5,4 @@ email_validator
 python-dotenv
 werkzeug
 Flask-Login
+fpdf2
