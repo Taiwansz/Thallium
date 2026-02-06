@@ -1,30 +1,16 @@
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Thalium Bank - Histórico de Transações</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
-</head>
-<body style="background-image: url('{{ url_for('static', filename='images/background.png') }}'); background-size: cover; background-position: center; background-repeat: no-repeat; background-attachment: fixed;">
-    <div class="header">
-        <div class="back-button-container">
-            <a href="javascript:history.back()" class="back-button">
-                <i class="fas fa-arrow-left"></i> Voltar
-            </a>
-        </div>
-        <div class="icons">
-            <div class="dropdown">
-                <i class="fas fa-cog" onclick="toggleDropdown()"></i>
-                <div id="dropdownMenu" class="dropdown-content">
-                    <a href="/logout">Logout</a>
-                </div>
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="content-card text-center">
+            <div class="text-success mb-3">
+                <i class="fas fa-check-circle fa-5x"></i>
             </div>
+            <h2 class="mb-3">Sucesso!</h2>
+            <p class="lead">{{ mensagem }}</p>
+            <a href="{{ url_for('index') }}" class="btn btn-primary mt-3">Voltar ao Início</a>
         </div>
     </div>
-    <div class="container">
-        <h2>{{ mensagem }}</h2>
-    </div>
-</body>
-</html>
+</div>
+{% endblock %}

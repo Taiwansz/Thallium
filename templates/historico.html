@@ -1,45 +1,68 @@
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Thalium Bank - Histórico de Transações</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
-</head>
-<body style="background-image: url('{{ url_for('static', filename='images/background.png') }}'); background-size: cover; background-position: center; background-repeat: no-repeat; background-attachment: fixed;">
-     <div class="header">
-        <div class="back-button-container">
-        <a href="javascript:history.back()" class="back-button">
-                <i class="fas fa-arrow-left"></i> Voltar
-            </a>
-        </div>
-        <div class="icons">
-            <div class="dropdown">
-                <i class="fas fa-cog" onclick="toggleDropdown()"></i>
-                <div id="dropdownMenu" class="dropdown-content">
-                    <a href="/logout">Logout</a>
-                </div>
-            </div>
-        </div>
-    </div>
-    <div class="content">
-        <div class="statement-section">
-            <h2 class="section-title">Histórico de Transações</h2>
-            {% for transacao in transacoes %}
-            <div class="transaction">
-                <div class="details">
-                    <span class="description">{{ transacao.descricao or transacao.tipo_transacao }}</span>
-                    <span class="date">{{ transacao.data_transacao.strftime('%d/%m/%Y %H:%M') }}</span>
-                </div>
-                <div class="amount {{ 'positive' if transacao.valor > 0 else 'negative' }}">
-                    {{ '+' if transacao.valor > 0 else '-' }} R$ {{ "%.2f" | format(transacao.valor) }}
-                </div>
-            </div>
-            {% endfor %}
-        </div>
-    </div>
+{% extends "base.html" %}
 
-    <script src="{{ url_for('static', filename='script.js') }}"></script>
-</body>
-</html>
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-10">
+        <div class="content-card">
+            <h2 class="text-center mb-4">Extrato</h2>
+
+            {% if transacoes %}
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Data</th>
+                            <th>Descrição</th>
+                            <th class="text-right">Valor</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for transacao in transacoes %}
+                        <tr>
+                            <td>{{ transacao.data_transacao | datetime }}</td>
+                            <td>{{ transacao.descricao or transacao.tipo_transacao }}</td>
+                            <td class="text-right {{ 'text-success' if transacao.valor > 0 else 'text-danger' }}">
+                                <strong>{{ '+' if transacao.valor > 0 else '' }} {{ transacao.valor | currency }}</strong>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+                <p class="text-center text-muted">Nenhuma transação encontrada.</p>
+            {% endif %}
+
+            <div class="text-center mt-3">
+                 <a href="{{ url_for('index') }}" class="btn btn-secondary">Voltar</a>
+            </div>
+
+            <!-- Pagination -->
+            {% if pagination.pages > 1 %}
+            <nav aria-label="Page navigation" class="mt-4">
+                <ul class="pagination justify-content-center">
+                    <li class="page-item {% if not pagination.has_prev %}disabled{% endif %}">
+                        <a class="page-link" href="{{ url_for('historico', page=pagination.prev_num) }}" tabindex="-1">Anterior</a>
+                    </li>
+                    {% for page_num in pagination.iter_pages(left_edge=1, right_edge=1, left_current=1, right_current=2) %}
+                        {% if page_num %}
+                            {% if pagination.page == page_num %}
+                            <li class="page-item active"><span class="page-link">{{ page_num }}</span></li>
+                            {% else %}
+                            <li class="page-item"><a class="page-link" href="{{ url_for('historico', page=page_num) }}">{{ page_num }}</a></li>
+                            {% endif %}
+                        {% else %}
+                            <li class="page-item disabled"><span class="page-link">...</span></li>
+                        {% endif %}
+                    {% endfor %}
+                    <li class="page-item {% if not pagination.has_next %}disabled{% endif %}">
+                        <a class="page-link" href="{{ url_for('historico', page=pagination.next_num) }}">Próxima</a>
+                    </li>
+                </ul>
+            </nav>
+            {% endif %}
+
+        </div>
+    </div>
+</div>
+{% endblock %}

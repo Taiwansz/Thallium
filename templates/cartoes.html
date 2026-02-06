@@ -1,63 +1,45 @@
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Thalium Bank - Histórico de Transações</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
-</head>
-<body style="background-image: url('{{ url_for('static', filename='images/background.png') }}'); background-size: cover; background-position: center; background-repeat: no-repeat; background-attachment: fixed;">
-    <div class="header">
-        <div class="back-button-container">
-            <a href="javascript:history.back()" class="back-button">
-                <i class="fas fa-arrow-left"></i> Voltar
-            </a>
-        </div>
-        <div class="icons">
-            <div class="dropdown">
-                <i class="fas fa-cog" onclick="toggleDropdown()"></i>
-                <div id="dropdownMenu" class="dropdown-content">
-                    <a href="/logout">Logout</a>
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="content-card">
+            <h2 class="text-center mb-4">Meus Cartões</h2>
+
+            {% if cartoes %}
+            <div class="row">
+                {% for cartao in cartoes %}
+                <div class="col-md-6 mb-3">
+                    <div class="card bg-dark text-white p-3" style="border-radius: 15px; min-height: 200px;">
+                        <div class="d-flex justify-content-between">
+                            <i class="fas fa-wifi"></i>
+                            <i class="fab fa-cc-mastercard fa-2x"></i>
+                        </div>
+                        <div class="mt-4">
+                            <h5 class="mb-0" style="letter-spacing: 2px;">{{ cartao.numero[:4] }} **** **** {{ cartao.numero[-4:] }}</h5>
+                        </div>
+                        <div class="d-flex justify-content-between mt-4 align-items-end">
+                            <div>
+                                <small>Titular</small><br>
+                                <span>{{ current_user.nome.split()[0] | upper }}</span>
+                            </div>
+                            <div>
+                                <small>Validade</small><br>
+                                <span>{{ cartao.validade }}</span>
+                            </div>
+                        </div>
+                    </div>
                 </div>
+                {% endfor %}
+            </div>
+            {% else %}
+                <p class="text-center text-muted">Nenhum cartão encontrado.</p>
+            {% endif %}
+
+            <div class="text-center mt-3">
+                 <a href="{{ url_for('index') }}" class="btn btn-secondary">Voltar</a>
             </div>
         </div>
     </div>
-
-    {% if cartoes %}
-        {% for cartao in cartoes %}
-            <div class="container">
-                <h1>Cartão virtual</h1>
-                <div class="card">
-                    <div class="logo">Thallium</div>
-                    <div class="details">
-                        <span>virtual</span>
-                        <span>platinum</span>
-                    </div>
-                    <div class="number">**** {{ cartao.numero[-4:] }}</div>
-                    <div class="mastercard">
-                        <i class="fab fa-cc-mastercard"></i>
-                    </div>
-                </div>
-                <div class="info">
-                    <div class="number-container">
-                        <span>Número</span>
-                        <span>{{ cartao.numero }}</span>
-                    </div>
-                    <div>
-                        <span>Validade</span>
-                        <span>{{ cartao.validade }}</span>
-                    </div>
-                    <div>
-                        <span>CVV</span>
-                        <span>{{ cartao.cvv }}</span>
-                    </div>
-                </div>
-            </div>
-        {% endfor %}
-    {% else %}
-        <p>Não há cartões registrados para este cliente.</p>
-    {% endif %}
-    <script src="{{ url_for('static', filename='script.js') }}"></script>
-</body>
-</html>
+</div>
+{% endblock %}
