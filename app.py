@@ -3,19 +3,27 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import date, datetime
 import random
 from decimal import Decimal
-from extensions import db
+from extensions import db, migrate, limiter, ma, swagger
 from config import Config
-from models import Cliente, Conta, Transacao, Emprestimo, Cartao, ChavePix, Investimento
+from models import Cliente, Conta, Transacao, Emprestimo, Cartao, ChavePix, Investimento, AuditLog
 from flask_login import LoginManager, login_user, login_required, logout_user, current_user
 from sqlalchemy.exc import IntegrityError
 from flask_wtf.csrf import CSRFProtect
 from utils import gerar_recibo_pdf
+from audit_service import log_audit
+from schemas import transferencia_schema
+from marshmallow import ValidationError
 
 app = Flask(__name__)
 app.config.from_object(Config)
 
 csrf = CSRFProtect(app)
 db.init_app(app)
+migrate.init_app(app, db)
+limiter.init_app(app)
+ma.init_app(app)
+swagger.init_app(app)
+
 login_manager = LoginManager()
 login_manager.init_app(app)
 login_manager.login_view = 'login'
@@ -149,7 +157,6 @@ def index():
 
     entradas = 0.0
     saidas = 0.0
-    transacoes_recentes = []
 
     if conta:
         transacoes = Transacao.query.filter_by(numero_conta=conta.numero_conta).all()
@@ -158,11 +165,6 @@ def index():
                 entradas += float(t.valor)
             else:
                 saidas += abs(float(t.valor))
-
-        # Get recent transactions (last 5)
-        transacoes_recentes = Transacao.query.filter_by(numero_conta=conta.numero_conta)\
-            .order_by(Transacao.data_transacao.desc())\
-            .limit(5).all()
 
     # Calculate Total Investments
     investimentos_ativos = Investimento.query.filter_by(id_cliente=current_user.id_cliente, resgatado=False).all()
@@ -176,10 +178,21 @@ def index():
                            user=current_user,
                            entradas=entradas,
                            saidas=saidas,
-                           transacoes_recentes=transacoes_recentes,
                            total_investido=total_investido,
                            patrimonio_total=patrimonio_total)
 
+@app.route('/transactions/recent')
+@login_required
+def recent_transactions():
+    conta = Conta.query.filter_by(id_cliente=current_user.id_cliente).first()
+    if not conta:
+        return ""
+
+    transacoes_recentes = Transacao.query.filter_by(numero_conta=conta.numero_conta)\
+            .order_by(Transacao.data_transacao.desc())\
+            .limit(5).all()
+
+    return render_template('_recent_transactions.html', transacoes_recentes=transacoes_recentes)
 
 @app.route('/extrato')
 @login_required
@@ -189,21 +202,22 @@ def extrato():
 
 @app.route('/transfer', methods=['GET', 'POST'])
 @login_required
+@limiter.limit("10 per hour")
 def transferir():
     if request.method == 'POST':
-        recipient_email = request.form.get('recipient')
+        # Validation
         try:
-            amount = Decimal(request.form.get('amount'))
-        except:
-            flash('Valor inválido.', 'error')
+            data = transferencia_schema.load(request.form)
+        except ValidationError as err:
+            for field, messages in err.messages.items():
+                for msg in messages:
+                    flash(f"{field}: {msg}", 'error')
             return redirect(url_for('transferir'))
 
-        description = request.form.get('description')
-        category = request.form.get('category', 'Outros')
-
-        if amount <= 0:
-            flash('Valor de transferência deve ser positivo.', 'error')
-            return redirect(url_for('transferir'))
+        recipient_email = data['recipient']
+        amount = data['amount']
+        description = data['description']
+        category = data['category']
 
         # Verify Transaction Password if set
         if current_user.senha_transacao:
@@ -254,6 +268,10 @@ def transferir():
 
             db.session.add(tx_out)
             db.session.add(tx_in)
+
+            # Audit Log
+            log_audit('Transferência', f"Enviado {amount} para {recipient_email}")
+
             db.session.commit()
 
             flash('Transferência realizada com sucesso!', 'success')
@@ -389,6 +407,7 @@ def sucesso():
 
 
 @app.route('/login', methods=['GET', 'POST'])
+@limiter.limit("5 per minute")
 def login():
     if current_user.is_authenticated:
         return redirect(url_for('index'))

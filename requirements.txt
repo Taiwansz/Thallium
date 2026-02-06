@@ -1,8 +1,12 @@
 Flask
 Flask-SQLAlchemy
-Flask-WTF
-email_validator
-python-dotenv
-werkzeug
 Flask-Login
+Flask-WTF
+python-dotenv
 fpdf2
+Flask-Migrate
+Flask-Limiter
+flask-marshmallow
+marshmallow-sqlalchemy
+flasgger
+gunicorn

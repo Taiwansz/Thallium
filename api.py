@@ -15,6 +15,32 @@ def get_balance(user_id):
 
 @api_bp.route('/transfer', methods=['POST'])
 def transfer():
+    """
+    Realiza uma transferência entre contas via API
+    ---
+    tags:
+      - API V1
+    parameters:
+      - in: body
+        name: body
+        required: true
+        schema:
+          type: object
+          properties:
+            sender_id:
+              type: integer
+            password:
+              type: string
+            recipient_email:
+              type: string
+            amount:
+              type: number
+    responses:
+      200:
+        description: Transferência realizada com sucesso
+      401:
+        description: Credenciais inválidas
+    """
     data = request.json
     sender_id = data.get('sender_id')
     recipient_email = data.get('recipient_email')

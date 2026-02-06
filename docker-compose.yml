@@ -5,8 +5,27 @@ services:
     build: .
     ports:
       - "5000:5000"
-    volumes:
-      - ./instance:/app/instance
     environment:
-      - SECRET_KEY=dev_secret_key
-      - DATABASE_URL=sqlite:///instance/thalium.db
+      - DATABASE_URL=postgresql://user:password@db:5432/thaliumbank
+      - FLASK_APP=app.py
+      - FLASK_DEBUG=1
+      - REDIS_URL=redis://redis:6379/0
+    depends_on:
+      - db
+      - redis
+    command: gunicorn -w 4 -b 0.0.0.0:5000 app:app
+
+  db:
+    image: postgres:15
+    environment:
+      - POSTGRES_USER=user
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_DB=thaliumbank
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  redis:
+    image: redis:7-alpine
+
+volumes:
+  postgres_data:

@@ -166,39 +166,11 @@
                 <a href="{{ url_for('historico') }}" class="text-success small font-weight-bold">Ver todas</a>
             </div>
 
-            <div class="transactions-list">
-                {% if transacoes_recentes %}
-                    {% for t in transacoes_recentes %}
-                    <div class="transaction-item">
-                        <div class="d-flex align-items-center w-100">
-                            <div class="trans-icon">
-                                {% if t.valor > 0 %}
-                                    <i class="fas fa-arrow-down text-success"></i>
-                                {% else %}
-                                    {% if 'Transferência' in t.tipo_transacao %}
-                                        <i class="fas fa-exchange-alt"></i>
-                                    {% elif 'Pix' in t.tipo_transacao %}
-                                        <i class="fab fa-pix"></i>
-                                    {% elif 'Cartão' in t.tipo_transacao %}
-                                        <i class="fas fa-shopping-bag"></i>
-                                    {% else %}
-                                        <i class="fas fa-arrow-up"></i>
-                                    {% endif %}
-                                {% endif %}
-                            </div>
-                            <div class="trans-info">
-                                <span class="trans-title">{{ t.descricao }}</span>
-                                <span class="trans-date">{{ t.categoria }} • {{ t.data_transacao | datetime }}</span>
-                            </div>
-                            <div class="trans-amount {{ 'amount-pos' if t.valor > 0 else 'amount-neg' }}">
-                                {{ '+ ' if t.valor > 0 else '' }}{{ t.valor | currency }}
-                            </div>
-                        </div>
-                    </div>
-                    {% endfor %}
-                {% else %}
-                    <p class="text-muted text-center py-4">Nenhuma transação recente.</p>
-                {% endif %}
+            <div id="recent-transactions"
+                 hx-get="{{ url_for('recent_transactions') }}"
+                 hx-trigger="load, every 30s">
+                 <!-- Content loaded via HTMX -->
+                 <div class="text-center py-4 text-muted">Carregando...</div>
             </div>
         </div>
     </div>

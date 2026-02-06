@@ -77,3 +77,12 @@ class Investimento(db.Model):
     data_aplicacao = db.Column(db.DateTime, default=datetime.utcnow)
     taxa_anual = db.Column(db.Numeric(5, 2), default=12.0) # 12% a.a. simulated
     resgatado = db.Column(db.Boolean, default=False)
+
+class AuditLog(db.Model):
+    __tablename__ = 'audit_logs'
+    id = db.Column(db.Integer, primary_key=True)
+    id_cliente = db.Column(db.Integer, ForeignKey('Clientes.id_cliente'))
+    action = db.Column(db.String(100), nullable=False)
+    details = db.Column(db.Text, nullable=True)
+    ip_address = db.Column(db.String(50))
+    timestamp = db.Column(db.DateTime, default=datetime.utcnow)
