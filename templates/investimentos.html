@@ -1,0 +1,88 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-12 mb-4">
+        <div class="content-card text-center">
+            <div class="mb-3 text-primary">
+                <i class="fas fa-chart-line fa-3x"></i>
+            </div>
+            <h2>Investimentos</h2>
+            <p class="text-muted mb-0">Faça seu dinheiro render mais.</p>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-4 mb-4">
+        <div class="content-card h-100">
+            <h4><i class="fas fa-wallet"></i> Total Investido</h4>
+            <h2 class="text-primary mt-3">{{ total_investido | currency }}</h2>
+            <small class="text-success">+ {{ total_rendimento | currency }} de rendimento</small>
+            <hr>
+            <form action="{{ url_for('investir') }}" method="POST">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                <div class="form-group">
+                    <label>Produto</label>
+                    <select class="form-control" name="tipo">
+                        <option value="CDB 100% CDI">CDB 100% CDI</option>
+                        <option value="LCI 90% CDI">LCI 90% CDI (Isento IR)</option>
+                        <option value="Tesouro Selic">Tesouro Selic</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Valor (Mín R$ 100)</label>
+                    <input type="number" class="form-control" name="valor" min="100" step="0.01" required>
+                </div>
+                <button type="submit" class="btn btn-primary btn-block">Investir</button>
+            </form>
+        </div>
+    </div>
+
+    <div class="col-md-8 mb-4">
+        <div class="content-card h-100">
+            <h4>Minhas Aplicações</h4>
+            {% if investimentos %}
+                <div class="table-responsive">
+                    <table class="table table-hover mt-3">
+                        <thead>
+                            <tr>
+                                <th>Produto</th>
+                                <th>Aplicado em</th>
+                                <th>Valor Bruto</th>
+                                <th>Rendimento</th>
+                                <th>Ação</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in investimentos %}
+                            <tr>
+                                <td>{{ item.obj.tipo }}</td>
+                                <td>{{ item.obj.data_aplicacao | datetime }}</td>
+                                <td>{{ item.valor_atual | currency }}</td>
+                                <td class="text-success">+ {{ item.rendimento | currency }}</td>
+                                <td>
+                                    <form action="{{ url_for('resgatar', id_inv=item.obj.id) }}" method="POST">
+                                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                                        <button class="btn btn-sm btn-outline-success">Resgatar</button>
+                                    </form>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <div class="text-center mt-5 text-muted">
+                    <i class="fas fa-piggy-bank fa-3x mb-3"></i>
+                    <p>Você ainda não possui investimentos.</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<div class="text-center">
+    <a href="{{ url_for('index') }}" class="btn btn-secondary">Voltar ao Início</a>
+</div>
+{% endblock %}

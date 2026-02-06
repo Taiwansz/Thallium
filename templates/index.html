@@ -1,66 +1,136 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="row">
-    <div class="col-md-12">
-        <div class="content-card mb-4 text-center">
-            <div class="d-flex justify-content-center align-items-center">
-                <h2 class="mr-3">Conta Corrente</h2>
-                <button class="btn btn-sm btn-outline-secondary" onclick="toggleBalance()">
-                    <i id="toggle-eye" class="fas fa-eye"></i>
-                </button>
+<div class="mb-4">
+    <h3 class="font-weight-bold">Bom dia, {{ user.nome.split()[0] }}</h3>
+    <p class="text-muted">Confira o resumo da sua conta</p>
+</div>
+
+<!-- Patrimonio Card -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="content-card card-patrimonio p-4">
+            <div class="d-flex justify-content-between align-items-start position-relative" style="z-index: 2;">
+                <div>
+                    <div class="patrimonio-label">Patrimônio Total</div>
+                    <div class="d-flex align-items-center">
+                        <div class="patrimonio-value mr-3" data-value="{{ patrimonio_total | currency }}">
+                            {{ patrimonio_total | currency }}
+                        </div>
+                        <button class="btn btn-sm btn-link text-white opacity-50 p-0" onclick="toggleBalance()">
+                            <i id="toggle-eye" class="fas fa-eye"></i>
+                        </button>
+                    </div>
+                </div>
             </div>
-            <div class="display-4 my-3 balance-value" data-value="{{ saldo | currency }}">{{ saldo | currency }}</div>
-            {% if saldo == 0 %}
-                <p class="text-muted">Seu saldo está zerado.</p>
-            {% endif %}
+            <div class="mt-4 position-relative" style="z-index: 2;">
+                <span class="badge-yield"><i class="fas fa-arrow-up mr-1"></i> +3.2% este mês</span>
+                <span class="text-white-50 ml-2 small">Atualizado há 5 minutos</span>
+            </div>
         </div>
     </div>
 </div>
 
-<div class="row">
-    <div class="col-md-12">
+<!-- Summary Cards -->
+<div class="row mb-4">
+    <!-- Conta Corrente -->
+    <div class="col-md-3 mb-3 mb-md-0">
+        <div class="content-card summary-card">
+            <div>
+                <div class="summary-icon icon-blue">
+                    <i class="fas fa-wallet"></i>
+                </div>
+                <div class="summary-label">Conta Corrente</div>
+                <div class="summary-value balance-value" data-value="{{ saldo | currency }}">{{ saldo | currency }}</div>
+            </div>
+        </div>
+    </div>
+    <!-- Investimentos -->
+    <div class="col-md-3 mb-3 mb-md-0">
+        <div class="content-card summary-card">
+            <div>
+                <div class="summary-icon icon-purple">
+                    <i class="fas fa-chart-line"></i>
+                </div>
+                <div class="summary-label">Investimentos</div>
+                <div class="summary-value balance-value" data-value="{{ total_investido | currency }}">{{ total_investido | currency }}</div>
+                <div class="summary-meta text-success mt-1 small font-weight-bold">+3.2%</div>
+            </div>
+        </div>
+    </div>
+    <!-- Fatura Atual (Mocked for now) -->
+    <div class="col-md-3 mb-3 mb-md-0">
+        <div class="content-card summary-card">
+            <div>
+                <div class="summary-icon icon-orange">
+                    <i class="fas fa-credit-card"></i>
+                </div>
+                <div class="summary-label">Fatura Atual</div>
+                <div class="summary-value">R$ 1.250,00</div> <!-- Mocked as per request context -->
+            </div>
+        </div>
+    </div>
+    <!-- Metas -->
+    <div class="col-md-3">
+        <div class="content-card summary-card">
+            <div>
+                <div class="summary-icon icon-green">
+                    <i class="fas fa-bullseye"></i>
+                </div>
+                <div class="summary-label">Metas</div>
+                <div class="summary-value">75%</div>
+                <div class="summary-meta text-success mt-1 small">Em progresso</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Ações Rápidas -->
+<div class="row mb-4">
+    <div class="col-12">
         <div class="content-card">
-            <h4 class="mb-4">Ações Rápidas</h4>
-            <div class="row text-center">
-                <div class="col-6 col-md-4 col-lg-2 mb-3">
-                    <a href="{{ url_for('pix.dashboard') }}" class="btn btn-outline-success btn-block p-3">
-                        <i class="fab fa-pix fa-2x mb-2"></i><br>Pix
+            <h5 class="mb-4">Ações Rápidas</h5>
+            <div class="row">
+                <div class="col-6 col-md-2 mb-3 mb-md-0">
+                    <a href="{{ url_for('transferir') }}" class="action-btn">
+                        <div class="action-icon bg-light-green"><i class="fas fa-exchange-alt"></i></div>
+                        <span class="action-label">Transferir</span>
+                        <span class="action-desc">Envie dinheiro</span>
                     </a>
                 </div>
-                <div class="col-6 col-md-4 col-lg-2 mb-3">
-                    <a href="{{ url_for('pagar') }}" class="btn btn-outline-primary btn-block p-3">
-                        <i class="fas fa-barcode fa-2x mb-2"></i><br>Pagar
+                <div class="col-6 col-md-2 mb-3 mb-md-0">
+                    <a href="{{ url_for('pix.dashboard') }}" class="action-btn">
+                        <div class="action-icon bg-light-green"><i class="fas fa-qrcode"></i></div>
+                        <span class="action-label">Pix</span>
+                        <span class="action-desc">Pagamentos</span>
                     </a>
                 </div>
-                <div class="col-6 col-md-4 col-lg-2 mb-3">
-                    <a href="{{ url_for('transferir') }}" class="btn btn-outline-primary btn-block p-3">
-                        <i class="fas fa-exchange-alt fa-2x mb-2"></i><br>Transferir
+                <div class="col-6 col-md-2 mb-3 mb-md-0">
+                    <a href="{{ url_for('investimentos') }}" class="action-btn">
+                        <div class="action-icon bg-light-green"><i class="fas fa-chart-bar"></i></div>
+                        <span class="action-label">Investir</span>
+                        <span class="action-desc">Aplique agora</span>
                     </a>
                 </div>
-                <div class="col-6 col-md-4 col-lg-2 mb-3">
-                    <a href="{{ url_for('deposito') }}" class="btn btn-outline-primary btn-block p-3">
-                        <i class="fas fa-money-bill-wave fa-2x mb-2"></i><br>Depósito
+                <div class="col-6 col-md-2 mb-3 mb-md-0">
+                    <a href="{{ url_for('cartoes') }}" class="action-btn">
+                        <div class="action-icon bg-light-green"><i class="fas fa-credit-card"></i></div>
+                        <span class="action-label">Cartões</span>
+                        <span class="action-desc">Gerencie</span>
                     </a>
                 </div>
-                <div class="col-6 col-md-4 col-lg-2 mb-3">
-                    <a href="{{ url_for('saque') }}" class="btn btn-outline-primary btn-block p-3">
-                        <i class="fas fa-money-bill-alt fa-2x mb-2"></i><br>Saque
+                <div class="col-6 col-md-2 mb-3 mb-md-0">
+                    <a href="{{ url_for('historico') }}" class="action-btn">
+                        <div class="action-icon bg-light-green"><i class="fas fa-file-invoice-dollar"></i></div>
+                        <span class="action-label">Extrato</span>
+                        <span class="action-desc">Movimentações</span>
                     </a>
                 </div>
-                <div class="col-6 col-md-4 col-lg-2 mb-3">
-                    <a href="{{ url_for('cartoes') }}" class="btn btn-outline-primary btn-block p-3">
-                        <i class="fas fa-credit-card fa-2x mb-2"></i><br>Cartões
-                    </a>
-                </div>
-                <div class="col-6 col-md-4 col-lg-2 mb-3">
-                    <a href="{{ url_for('historico') }}" class="btn btn-outline-primary btn-block p-3">
-                        <i class="fas fa-history fa-2x mb-2"></i><br>Extrato
-                    </a>
-                </div>
-                 <div class="col-6 col-md-4 col-lg-2 mb-3">
-                    <a href="{{ url_for('emprestimo') }}" class="btn btn-outline-primary btn-block p-3">
-                        <i class="fas fa-hand-holding-usd fa-2x mb-2"></i><br>Empréstimo
+                <div class="col-6 col-md-2 mb-3 mb-md-0">
+                    <a href="{{ url_for('investimentos') }}" class="action-btn"> <!-- Redirect to investments for now -->
+                        <div class="action-icon bg-light-green"><i class="fas fa-piggy-bank"></i></div>
+                        <span class="action-label">Poupar</span>
+                        <span class="action-desc">Metas</span>
                     </a>
                 </div>
             </div>
@@ -68,37 +138,96 @@
     </div>
 </div>
 
-<div class="row mt-4">
-    <div class="col-md-6 mb-4">
+<!-- Bottom Section: Charts & Transactions -->
+<div class="row">
+    <!-- Evolução Patrimonial -->
+    <div class="col-md-7 mb-4 mb-md-0">
         <div class="content-card h-100">
-            <h3>Cartão de Crédito</h3>
-            <p>Fatura atual</p>
-            <p class="h4 text-primary">R$ 1.094,80</p>
-            <p class="text-muted">Limite disponível: R$ 13.000,00</p>
-            <a href="{{ url_for('cartoes') }}" class="btn btn-primary btn-sm">Acessar Cartão</a>
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h5 class="mb-0">Evolução Patrimonial</h5>
+                <div class="btn-group btn-group-sm" role="group">
+                    <button type="button" class="btn btn-light">7M</button>
+                    <button type="button" class="btn btn-white border">1A</button>
+                    <button type="button" class="btn btn-white border">Max</button>
+                </div>
+            </div>
+            <p class="text-muted small">Últimos 7 meses</p>
+            <div style="height: 300px;">
+                <canvas id="evolutionChart"></canvas>
+            </div>
         </div>
     </div>
-    <div class="col-md-6 mb-4">
+
+    <!-- Transações Recentes -->
+    <div class="col-md-5">
         <div class="content-card h-100">
-            <h3>Resumo Financeiro</h3>
-            <div style="height: 200px;">
-                <canvas id="financeChart"></canvas>
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h5 class="mb-0">Transações Recentes</h5>
+                <a href="{{ url_for('historico') }}" class="text-success small font-weight-bold">Ver todas</a>
+            </div>
+
+            <div class="transactions-list">
+                {% if transacoes_recentes %}
+                    {% for t in transacoes_recentes %}
+                    <div class="transaction-item">
+                        <div class="d-flex align-items-center w-100">
+                            <div class="trans-icon">
+                                {% if t.valor > 0 %}
+                                    <i class="fas fa-arrow-down text-success"></i>
+                                {% else %}
+                                    {% if 'Transferência' in t.tipo_transacao %}
+                                        <i class="fas fa-exchange-alt"></i>
+                                    {% elif 'Pix' in t.tipo_transacao %}
+                                        <i class="fab fa-pix"></i>
+                                    {% elif 'Cartão' in t.tipo_transacao %}
+                                        <i class="fas fa-shopping-bag"></i>
+                                    {% else %}
+                                        <i class="fas fa-arrow-up"></i>
+                                    {% endif %}
+                                {% endif %}
+                            </div>
+                            <div class="trans-info">
+                                <span class="trans-title">{{ t.descricao }}</span>
+                                <span class="trans-date">{{ t.categoria }} • {{ t.data_transacao | datetime }}</span>
+                            </div>
+                            <div class="trans-amount {{ 'amount-pos' if t.valor > 0 else 'amount-neg' }}">
+                                {{ '+ ' if t.valor > 0 else '' }}{{ t.valor | currency }}
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <p class="text-muted text-center py-4">Nenhuma transação recente.</p>
+                {% endif %}
             </div>
         </div>
     </div>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
-    var ctx = document.getElementById('financeChart').getContext('2d');
-    var financeChart = new Chart(ctx, {
-        type: 'doughnut',
+    // Chart.js - Mock Data for "Evolução Patrimonial"
+    // Since we don't have historical snapshot data in DB, we mock it for visual fidelity
+    var ctx = document.getElementById('evolutionChart').getContext('2d');
+
+    // Gradient
+    var gradient = ctx.createLinearGradient(0, 0, 0, 400);
+    gradient.addColorStop(0, 'rgba(0, 208, 156, 0.2)');
+    gradient.addColorStop(1, 'rgba(0, 208, 156, 0.0)');
+
+    var evolutionChart = new Chart(ctx, {
+        type: 'line',
         data: {
-            labels: ['Entradas', 'Saídas'],
+            labels: ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul'],
             datasets: [{
-                data: [{{ entradas }}, {{ saidas }}],
-                backgroundColor: ['#28a745', '#dc3545'],
-                borderWidth: 1
+                label: 'Patrimônio',
+                data: [750000, 765000, 780000, 775000, 800000, 820000, {{ patrimonio_total }}], // Mock data ending in real total
+                backgroundColor: gradient,
+                borderColor: '#00d09c',
+                borderWidth: 2,
+                pointRadius: 0,
+                pointHoverRadius: 5,
+                fill: true,
+                tension: 0.4
             }]
         },
         options: {
@@ -106,7 +235,25 @@
             maintainAspectRatio: false,
             plugins: {
                 legend: {
-                    position: 'bottom'
+                    display: false
+                }
+            },
+            scales: {
+                x: {
+                    grid: {
+                        display: false
+                    }
+                },
+                y: {
+                    grid: {
+                        color: '#f0f2f5',
+                        borderDash: [5, 5]
+                    },
+                    ticks: {
+                        callback: function(value, index, values) {
+                            return 'R$ ' + value / 1000 + ' mil';
+                        }
+                    }
                 }
             }
         }

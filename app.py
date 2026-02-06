@@ -5,7 +5,7 @@ import random
 from decimal import Decimal
 from extensions import db
 from config import Config
-from models import Cliente, Conta, Transacao, Emprestimo, Cartao, ChavePix
+from models import Cliente, Conta, Transacao, Emprestimo, Cartao, ChavePix, Investimento
 from flask_login import LoginManager, login_user, login_required, logout_user, current_user
 from sqlalchemy.exc import IntegrityError
 from flask_wtf.csrf import CSRFProtect
@@ -22,6 +22,9 @@ login_manager.login_view = 'login'
 
 from routes_pix import pix_bp
 app.register_blueprint(pix_bp)
+
+from api import api_bp
+app.register_blueprint(api_bp)
 
 @login_manager.user_loader
 def load_user(user_id):
@@ -146,6 +149,8 @@ def index():
 
     entradas = 0.0
     saidas = 0.0
+    transacoes_recentes = []
+
     if conta:
         transacoes = Transacao.query.filter_by(numero_conta=conta.numero_conta).all()
         for t in transacoes:
@@ -154,7 +159,26 @@ def index():
             else:
                 saidas += abs(float(t.valor))
 
-    return render_template('index.html', saldo=saldo, user=current_user, entradas=entradas, saidas=saidas)
+        # Get recent transactions (last 5)
+        transacoes_recentes = Transacao.query.filter_by(numero_conta=conta.numero_conta)\
+            .order_by(Transacao.data_transacao.desc())\
+            .limit(5).all()
+
+    # Calculate Total Investments
+    investimentos_ativos = Investimento.query.filter_by(id_cliente=current_user.id_cliente, resgatado=False).all()
+    total_investido = sum([i.valor_inicial for i in investimentos_ativos])
+
+    # Calculate Total Patrimony
+    patrimonio_total = Decimal(saldo) + total_investido
+
+    return render_template('index.html',
+                           saldo=saldo,
+                           user=current_user,
+                           entradas=entradas,
+                           saidas=saidas,
+                           transacoes_recentes=transacoes_recentes,
+                           total_investido=total_investido,
+                           patrimonio_total=patrimonio_total)
 
 
 @app.route('/extrato')
@@ -448,6 +472,154 @@ def bloquear_cartao(id_cartao):
         flash('Cartão não encontrado.', 'error')
     return redirect(url_for('cartoes'))
 
+@app.route('/investimentos')
+@login_required
+def investimentos():
+    meus_investimentos = Investimento.query.filter_by(id_cliente=current_user.id_cliente, resgatado=False).all()
+
+    # Simulate yield calculation (simplified)
+    total_investido = Decimal(0)
+    total_rendimento = Decimal(0)
+
+    lista_com_rendimento = []
+
+    for inv in meus_investimentos:
+        dias_corridos = (datetime.utcnow() - inv.data_aplicacao).days
+        # Formula: M = P * (1 + i)^t (daily rate simplified)
+        # taxa_anual / 365 = daily rate
+        taxa_diaria = (inv.taxa_anual / 100) / 365
+        rendimento = inv.valor_inicial * (taxa_diaria * dias_corridos)
+        valor_atual = inv.valor_inicial + rendimento
+
+        total_investido += inv.valor_inicial
+        total_rendimento += rendimento
+
+        lista_com_rendimento.append({
+            'obj': inv,
+            'valor_atual': valor_atual,
+            'rendimento': rendimento
+        })
+
+    return render_template('investimentos.html', investimentos=lista_com_rendimento, total_investido=total_investido, total_rendimento=total_rendimento)
+
+@app.route('/investir', methods=['POST'])
+@login_required
+def investir():
+    try:
+        valor = Decimal(request.form.get('valor'))
+        tipo = request.form.get('tipo')
+    except:
+        flash('Dados inválidos.', 'error')
+        return redirect(url_for('investimentos'))
+
+    if valor < 100:
+         flash('Valor mínimo de R$ 100,00.', 'error')
+         return redirect(url_for('investimentos'))
+
+    conta = Conta.query.filter_by(id_cliente=current_user.id_cliente).first()
+    if conta.saldo < valor:
+         flash('Saldo insuficiente.', 'error')
+         return redirect(url_for('investimentos'))
+
+    try:
+        conta.saldo -= valor
+        tx = Transacao(
+            numero_conta=conta.numero_conta,
+            tipo_transacao='Aplicação',
+            valor=-valor,
+            descricao=f"Investimento em {tipo}",
+            categoria='Investimentos'
+        )
+        inv = Investimento(
+            id_cliente=current_user.id_cliente,
+            tipo=tipo,
+            valor_inicial=valor
+        )
+
+        db.session.add(tx)
+        db.session.add(inv)
+        db.session.commit()
+        flash('Investimento realizado com sucesso!', 'success')
+    except Exception as e:
+        db.session.rollback()
+        flash(f'Erro: {str(e)}', 'error')
+
+    return redirect(url_for('investimentos'))
+
+@app.route('/resgatar/<int:id_inv>', methods=['POST'])
+@login_required
+def resgatar(id_inv):
+    inv = Investimento.query.filter_by(id=id_inv, id_cliente=current_user.id_cliente).first()
+    if not inv or inv.resgatado:
+         flash('Investimento não encontrado.', 'error')
+         return redirect(url_for('investimentos'))
+
+    # Calculate final value
+    dias_corridos = (datetime.utcnow() - inv.data_aplicacao).days
+    taxa_diaria = (inv.taxa_anual / 100) / 365
+    rendimento = inv.valor_inicial * (taxa_diaria * dias_corridos)
+    valor_final = inv.valor_inicial + rendimento
+
+    conta = Conta.query.filter_by(id_cliente=current_user.id_cliente).first()
+
+    try:
+        inv.resgatado = True
+        conta.saldo += valor_final
+        tx = Transacao(
+            numero_conta=conta.numero_conta,
+            tipo_transacao='Resgate',
+            valor=valor_final,
+            descricao=f"Resgate {inv.tipo}",
+            categoria='Investimentos'
+        )
+        db.session.add(tx)
+        db.session.commit()
+        flash(f'Resgate de R$ {valor_final:,.2f} realizado!', 'success')
+    except Exception as e:
+        db.session.rollback()
+        flash(f'Erro: {str(e)}', 'error')
+
+    return redirect(url_for('investimentos'))
+
+@app.route('/recarga', methods=['GET', 'POST'])
+@login_required
+def recarga():
+    if request.method == 'POST':
+        operadora = request.form.get('operadora')
+        telefone = request.form.get('telefone')
+        valor = Decimal(request.form.get('valor'))
+
+        # Verify PIN
+        if current_user.senha_transacao:
+            pin = request.form.get('pin')
+            if not pin or not check_password_hash(current_user.senha_transacao, pin):
+                 flash('Senha de transação incorreta.', 'error')
+                 return redirect(url_for('recarga'))
+
+        conta = Conta.query.filter_by(id_cliente=current_user.id_cliente).first()
+        if conta.saldo < valor:
+             flash('Saldo insuficiente.', 'error')
+             return redirect(url_for('recarga'))
+
+        try:
+            conta.saldo -= valor
+            tx = Transacao(
+                numero_conta=conta.numero_conta,
+                tipo_transacao='Recarga Celular',
+                valor=-valor,
+                descricao=f"Recarga {operadora} - {telefone}",
+                categoria='Telefonia'
+            )
+            db.session.add(tx)
+            db.session.commit()
+            flash(f'Recarga de R$ {valor} efetuada com sucesso!', 'success')
+            return redirect(url_for('index'))
+        except Exception as e:
+            db.session.rollback()
+            flash(f'Erro: {str(e)}', 'error')
+
+    return render_template('recarga.html')
+
 @app.route('/cartoes/desbloquear/<int:id_cartao>', methods=['POST'])
 @login_required
 def desbloquear_cartao(id_cartao):
@@ -550,8 +722,9 @@ def emprestimo():
 def confirmacao():
     return render_template('confirmacao.html', mensagem="Seu pedido de empréstimo foi enviado com sucesso!")
 
+# Ensure tables are created (for dev/demo purposes)
+with app.app_context():
+    db.create_all()
 
 if __name__ == '__main__':
-    with app.app_context():
-        db.create_all()
     app.run(debug=True)

@@ -67,3 +67,13 @@ class ChavePix(db.Model):
     tipo = db.Column(db.String(20), nullable=False) # cpf, email, aleatoria
     chave = db.Column(db.String(100), unique=True, nullable=False)
     id_cliente = db.Column(db.Integer, ForeignKey('Clientes.id_cliente', ondelete='CASCADE'))
+
+class Investimento(db.Model):
+    __tablename__ = 'investimentos'
+    id = db.Column(db.Integer, primary_key=True)
+    id_cliente = db.Column(db.Integer, ForeignKey('Clientes.id_cliente'))
+    tipo = db.Column(db.String(50), nullable=False) # CDB, LCI, Tesouro
+    valor_inicial = db.Column(db.Numeric(15, 2), nullable=False)
+    data_aplicacao = db.Column(db.DateTime, default=datetime.utcnow)
+    taxa_anual = db.Column(db.Numeric(5, 2), default=12.0) # 12% a.a. simulated
+    resgatado = db.Column(db.Boolean, default=False)
