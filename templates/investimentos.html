@@ -16,55 +16,78 @@
 <div class="row">
     <div class="col-md-4 mb-4">
         <div class="content-card h-100">
-            <h4><i class="fas fa-wallet"></i> Total Investido</h4>
-            <h2 class="text-primary mt-3">{{ total_investido | currency }}</h2>
-            <small class="text-success">+ {{ total_rendimento | currency }} de rendimento</small>
+            <h4><i class="fas fa-wallet"></i> Novo Aporte</h4>
+            <p class="text-muted small">Comece a investir com apenas R$ 100,00</p>
             <hr>
             <form action="{{ url_for('investir') }}" method="POST">
                 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
                 <div class="form-group">
                     <label>Produto</label>
-                    <select class="form-control" name="tipo">
-                        <option value="CDB 100% CDI">CDB 100% CDI</option>
+                    <select class="form-control custom-select" name="tipo">
+                        <option value="CDB 100% CDI">CDB 100% CDI (Seguro)</option>
                         <option value="LCI 90% CDI">LCI 90% CDI (Isento IR)</option>
-                        <option value="Tesouro Selic">Tesouro Selic</option>
+                        <option value="Tesouro Selic">Tesouro Selic (Alta Liquidez)</option>
                     </select>
                 </div>
                 <div class="form-group">
-                    <label>Valor (Mín R$ 100)</label>
-                    <input type="number" class="form-control" name="valor" min="100" step="0.01" required>
+                    <label>Valor (R$)</label>
+                    <div class="input-group">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text">R$</span>
+                        </div>
+                        <input type="number" class="form-control" name="valor" min="100" step="0.01" placeholder="0,00" required>
+                    </div>
                 </div>
-                <button type="submit" class="btn btn-primary btn-block">Investir</button>
+                <button type="submit" class="btn btn-success btn-block font-weight-bold">
+                    <i class="fas fa-rocket mr-2"></i> Investir Agora
+                </button>
             </form>
         </div>
     </div>
 
     <div class="col-md-8 mb-4">
-        <div class="content-card h-100">
-            <h4>Minhas Aplicações</h4>
+        <!-- Performance Chart -->
+        <div class="content-card mb-4">
+            <div class="d-flex justify-content-between align-items-end mb-3">
+                <div>
+                    <h5 class="mb-0">Rendimento Acumulado</h5>
+                    <h2 class="text-primary mb-0 mt-2">{{ total_rendimento | currency }}</h2>
+                </div>
+                <div class="text-right">
+                    <small class="text-muted">Total Investido</small>
+                    <h4 class="mb-0">{{ total_investido | currency }}</h4>
+                </div>
+            </div>
+            <div style="height: 250px;">
+                <canvas id="investmentChart"></canvas>
+            </div>
+        </div>
+
+        <div class="content-card">
+            <h5 class="mb-3">Minhas Aplicações</h5>
             {% if investimentos %}
                 <div class="table-responsive">
-                    <table class="table table-hover mt-3">
-                        <thead>
+                    <table class="table table-hover">
+                        <thead class="thead-light">
                             <tr>
                                 <th>Produto</th>
-                                <th>Aplicado em</th>
-                                <th>Valor Bruto</th>
-                                <th>Rendimento</th>
-                                <th>Ação</th>
+                                <th>Data</th>
+                                <th>Valor Atual</th>
+                                <th>Rentabilidade</th>
+                                <th></th>
                             </tr>
                         </thead>
                         <tbody>
                             {% for item in investimentos %}
                             <tr>
-                                <td>{{ item.obj.tipo }}</td>
-                                <td>{{ item.obj.data_aplicacao | datetime }}</td>
-                                <td>{{ item.valor_atual | currency }}</td>
-                                <td class="text-success">+ {{ item.rendimento | currency }}</td>
-                                <td>
+                                <td class="align-middle font-weight-bold">{{ item.obj.tipo }}</td>
+                                <td class="align-middle text-muted small">{{ item.obj.data_aplicacao | datetime }}</td>
+                                <td class="align-middle">{{ item.valor_atual | currency }}</td>
+                                <td class="align-middle text-success font-weight-bold">+ {{ item.rendimento | currency }}</td>
+                                <td class="text-right">
                                     <form action="{{ url_for('resgatar', id_inv=item.obj.id) }}" method="POST">
                                         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
-                                        <button class="btn btn-sm btn-outline-success">Resgatar</button>
+                                        <button class="btn btn-sm btn-outline-primary rounded-pill px-3">Resgatar</button>
                                     </form>
                                 </td>
                             </tr>
@@ -73,14 +96,53 @@
                     </table>
                 </div>
             {% else %}
-                <div class="text-center mt-5 text-muted">
-                    <i class="fas fa-piggy-bank fa-3x mb-3"></i>
-                    <p>Você ainda não possui investimentos.</p>
+                <div class="text-center py-5">
+                    <div class="mb-3 text-muted opacity-50">
+                        <i class="fas fa-piggy-bank fa-4x"></i>
+                    </div>
+                    <h5>Nenhum investimento ativo</h5>
+                    <p class="text-muted">Faça seu primeiro aporte agora mesmo!</p>
                 </div>
             {% endif %}
         </div>
     </div>
 </div>
+
+<script>
+    // Mock Chart for Investment Growth
+    var ctx = document.getElementById('investmentChart').getContext('2d');
+    var gradient = ctx.createLinearGradient(0, 0, 0, 300);
+    gradient.addColorStop(0, 'rgba(40, 167, 69, 0.2)');
+    gradient.addColorStop(1, 'rgba(40, 167, 69, 0.0)');
+
+    var investmentChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul'],
+            datasets: [{
+                label: 'Rentabilidade',
+                data: [0, 50, 120, 200, 350, 480, {{ total_rendimento }}], // Mock trajectory ending in real yield
+                backgroundColor: gradient,
+                borderColor: '#28a745',
+                borderWidth: 2,
+                pointRadius: 3,
+                fill: true,
+                tension: 0.4
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { display: false }
+            },
+            scales: {
+                x: { grid: { display: false } },
+                y: { grid: { borderDash: [5, 5] } }
+            }
+        }
+    });
+</script>
 
 <div class="text-center">
     <a href="{{ url_for('index') }}" class="btn btn-secondary">Voltar ao Início</a>

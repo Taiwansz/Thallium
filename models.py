@@ -1,5 +1,5 @@
 from extensions import db
-from datetime import datetime
+from datetime import datetime, date
 from sqlalchemy import ForeignKey
 from sqlalchemy.orm import relationship
 from flask_login import UserMixin
@@ -60,6 +60,16 @@ class Cartao(db.Model):
     cvv = db.Column(db.String(3), nullable=False)
     id_cliente = db.Column(db.Integer, ForeignKey('Clientes.id_cliente'))
     bloqueado = db.Column(db.Boolean, default=False)
+
+    # Credit Details
+    limite_total = db.Column(db.Numeric(15, 2), default=15000.00)
+    limite_usado = db.Column(db.Numeric(15, 2), default=0.00)
+    fatura_fechada = db.Column(db.Boolean, default=False)
+    data_vencimento = db.Column(db.Date, nullable=False, default=date.today) # Simplified, usually day of month
+
+    @property
+    def limite_disponivel(self):
+        return self.limite_total - self.limite_usado
 
 class ChavePix(db.Model):
     __tablename__ = 'chaves_pix'
