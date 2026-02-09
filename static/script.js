@@ -1,120 +1,63 @@
-function redirectIndex() {
-    window.location.href = "/index";
-}
+// Script.js - Placeholder for future interactivity
+console.log('Thalium Bank App Loaded');
 
-function redirectPagar() {
-    window.location.href = "/boleto";
-}
+$(document).ready(function() {
+    // Input Masks
+    $(":input").inputmask();
+    $("#cpf").inputmask("999.999.999-99");
 
-function redirectTransferir() {
-    window.location.href = "/transfer";
-}
+    // Auto Logout Timer (5 minutes)
+    let inactivityTime = function () {
+        let time;
+        window.onload = resetTimer;
+        document.onmousemove = resetTimer;
+        document.onkeypress = resetTimer;
 
-function redirectSaque() {
-    window.location.href = "/saque";
-}
-
-function redirectEmprestimo() {
-    window.location.href = "/emprestimo";
-}
-
-function redirectDeposito() {
-    window.location.href = '/deposito';
-}
-
-function redirectHistorico() {
-    window.location.href = "/historico";
-}
-
-function redirectConfiguracoes() {
-    window.location.href = "/config";
-}
-
-function redirectCartoes() {
-    window.location.href = "/cartoes";
-}
-
-function redirectSaques() {
-    window.location.href = "/saques";
-}
-
-function toggleDropdown() {
-    const dropdown = document.getElementById("dropdownMenu");
-    dropdown.style.display = dropdown.style.display === "block" ? "none" : "block";
-}
-
-
-window.onclick = function(event) {
-    if (!event.target.matches('.fas.fa-cog')) {
-        const dropdowns = document.getElementsByClassName("dropdown-content");
-        for (let i = 0; i < dropdowns.length; i++) {
-            let openDropdown = dropdowns[i];
-            if (openDropdown.style.display === "block") {
-                openDropdown.style.display = "none";
-            }
+        function logout() {
+            window.location.href = '/logout';
         }
+
+        function resetTimer() {
+            clearTimeout(time);
+            time = setTimeout(logout, 300000); // 5 minutes
+        }
+    };
+    inactivityTime();
+});
+
+// Privacy Toggle
+function toggleBalance() {
+    const balances = document.querySelectorAll('.balance-value');
+    const icon = document.getElementById('toggle-eye');
+    let isHidden = localStorage.getItem('balanceHidden') === 'true';
+
+    if (isHidden) {
+        // Show
+        balances.forEach(el => {
+            el.innerText = el.getAttribute('data-value');
+            el.classList.remove('blur-text');
+        });
+        icon.classList.remove('fa-eye-slash');
+        icon.classList.add('fa-eye');
+        localStorage.setItem('balanceHidden', 'false');
+    } else {
+        // Hide
+        balances.forEach(el => {
+            el.setAttribute('data-value', el.innerText);
+            el.innerText = '••••••';
+            el.classList.add('blur-text');
+        });
+        icon.classList.remove('fa-eye');
+        icon.classList.add('fa-eye-slash');
+        localStorage.setItem('balanceHidden', 'true');
     }
 }
 
-function redirectLogin() {
-    window.location.href = "/login";
-}
-
-function redirectCadastro() {
-    window.location.href = "/cadastro";
-}
-
-
-function showErrorPopup(message) {
-    const popup = document.getElementById('errorPopup');
-    popup.querySelector('.popup-content').innerText = message;
-    popup.style.display = 'block';
-
-    setTimeout(() => {
-        popup.style.display = 'none';
-    }, 3000);
-}
-
-function adquirirCartao() {
-    const usuarioId = 1;
-
-    fetch('/adquirir_cartao', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ usuario_id: usuarioId })
-    })
-    .then(response => response.json())
-    .then(data => {
-        console.log(data);
-
-        if (data.message === 'Cartão gerado com sucesso!') {
-
-            alert('Cartão gerado com sucesso!');
-            const cartao = data.numero_cartao;
-            const validade = data.validade;
-            const cvv = data.cvv;
-
-            console.log('CVV:', cvv);
-
-
-            document.querySelector('.credit-card-info').innerHTML = `
-                <h3>Informações do Cartão</h3>
-                <div class="info">
-                    <p><strong>Número do Cartão:</strong> ${cartao}</p>
-                    <p><strong>Validade:</strong> ${validade}</p>
-                    <p><strong>CVV:</strong> ${cvv}</p>
-                </div>
-            `;
-
-            document.querySelector('#adquirir-cartao').style.display = 'none';
-        } else {
-            alert(data.message);
-        }
-    })
-    .catch(error => {
-        console.error('Erro ao adquirir cartão:', error);
-        alert('Ocorreu um erro ao gerar o cartão.');
-    });
-}
+// Initialize state on load
+document.addEventListener("DOMContentLoaded", function() {
+    if (localStorage.getItem('balanceHidden') === 'true') {
+        // Force hide immediately
+        localStorage.setItem('balanceHidden', 'false'); // Toggle logic expects opposite
+        toggleBalance();
+    }
+});

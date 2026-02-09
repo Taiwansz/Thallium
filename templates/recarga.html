@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="content-card">
+            <h2 class="text-center mb-4"><i class="fas fa-mobile-alt"></i> Recarga de Celular</h2>
+            <form method="POST">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+
+                <div class="form-group">
+                    <label>Operadora</label>
+                    <div class="btn-group btn-group-toggle w-100" data-toggle="buttons">
+                        <label class="btn btn-outline-primary active">
+                            <input type="radio" name="operadora" value="Vivo" checked> Vivo
+                        </label>
+                        <label class="btn btn-outline-primary">
+                            <input type="radio" name="operadora" value="Claro"> Claro
+                        </label>
+                        <label class="btn btn-outline-primary">
+                            <input type="radio" name="operadora" value="Tim"> Tim
+                        </label>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Número com DDD</label>
+                    <input type="text" class="form-control" id="telefone" name="telefone" placeholder="(00) 00000-0000" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Valor</label>
+                    <select class="form-control" name="valor">
+                        <option value="15">R$ 15,00</option>
+                        <option value="20">R$ 20,00</option>
+                        <option value="30">R$ 30,00</option>
+                        <option value="50">R$ 50,00</option>
+                        <option value="100">R$ 100,00</option>
+                    </select>
+                </div>
+
+                {% if current_user.senha_transacao %}
+                <div class="form-group">
+                    <label for="pin">Senha de Transação</label>
+                    <input type="password" class="form-control" id="pin" name="pin" maxlength="4" required>
+                </div>
+                {% endif %}
+
+                <button type="submit" class="btn btn-primary btn-block">Confirmar Recarga</button>
+            </form>
+            <div class="text-center mt-3">
+                 <a href="{{ url_for('index') }}" class="btn btn-secondary">Cancelar</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    $(document).ready(function(){
+        $('#telefone').inputmask('(99) 99999-9999');
+    });
+</script>
+{% endblock %}
