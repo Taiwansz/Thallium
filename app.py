@@ -792,9 +792,5 @@ def emprestimo():
 def confirmacao():
     return render_template('confirmacao.html', mensagem="Seu pedido de empréstimo foi enviado com sucesso!")
 
-# Ensure tables are created (for dev/demo purposes)
-with app.app_context():
-    db.create_all()
-
 if __name__ == '__main__':
     app.run(debug=True)
