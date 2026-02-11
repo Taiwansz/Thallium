@@ -14,9 +14,11 @@ from audit_service import log_audit
 from schemas import transferencia_schema
 from marshmallow import ValidationError
 from jobs import yield_daily_command
+from seed import seed_admin_command
 
 app = Flask(__name__)
 app.cli.add_command(yield_daily_command)
+app.cli.add_command(seed_admin_command)
 app.config.from_object(Config)
 
 csrf = CSRFProtect(app)
