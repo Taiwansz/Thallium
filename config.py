@@ -11,7 +11,12 @@ class Config:
     if database_url and database_url.startswith("postgres://"):
         database_url = database_url.replace("postgres://", "postgresql://", 1)
 
-    SQLALCHEMY_DATABASE_URI = database_url or 'sqlite:///thalium.db'
+    if database_url:
+        SQLALCHEMY_DATABASE_URI = database_url
+    else:
+        # Fallback to SQLite in instance folder
+        basedir = os.path.abspath(os.path.dirname(__file__))
+        SQLALCHEMY_DATABASE_URI = 'sqlite:///' + os.path.join(basedir, 'instance', 'thalium.db')
 
     # Log connection info (safely)
     db_type = 'PostgreSQL' if 'postgresql' in SQLALCHEMY_DATABASE_URI else 'SQLite'

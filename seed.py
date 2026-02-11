@@ -18,13 +18,18 @@ def seed_admin_command():
 
     existing = Cliente.query.filter_by(email=email_val).first()
     if existing:
-        print(f"Admin user {username} already exists.")
+        print(f"Admin user {username} already exists. Updating credentials...")
+
+        # Force update password
+        existing.senha = generate_password_hash("admin")
+
         # Update balance just in case
         conta = Conta.query.filter_by(id_cliente=existing.id_cliente).first()
         if conta:
             conta.saldo = Decimal("999999999.00")
-            db.session.commit()
-            print("Admin balance reset to 999M.")
+
+        db.session.commit()
+        print("Admin password reset to 'admin' and balance reset to 999M.")
         return
 
     print(f"Creating Admin user {username}...")
