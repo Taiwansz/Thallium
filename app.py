@@ -3,9 +3,9 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import date, datetime
 import random
 from decimal import Decimal
-from extensions import db, migrate, limiter, ma, swagger
+from extensions import db, migrate, limiter, ma, swagger, mail
 from config import Config
-from models import Cliente, Conta, Transacao, Emprestimo, Cartao, ChavePix, Investimento, AuditLog
+from models import Cliente, Conta, Transacao, Emprestimo, Cartao, ChavePix, Investimento, AuditLog, VerificationCode
 from flask_login import LoginManager, login_user, login_required, logout_user, current_user
 from sqlalchemy.exc import IntegrityError
 from flask_wtf.csrf import CSRFProtect
@@ -15,6 +15,7 @@ from schemas import transferencia_schema
 from marshmallow import ValidationError
 from jobs import yield_daily_command
 from seed import seed_admin_command
+from email_service import send_verification_email, verify_code
 
 app = Flask(__name__)
 app.cli.add_command(yield_daily_command)
@@ -27,6 +28,7 @@ migrate.init_app(app, db)
 limiter.init_app(app)
 ma.init_app(app)
 swagger.init_app(app)
+mail.init_app(app)
 
 login_manager = LoginManager()
 login_manager.init_app(app)
@@ -100,14 +102,24 @@ def cadastrar_cliente():
     senha_hash = generate_password_hash(senha)
 
     try:
-        new_cliente = Cliente(nome=nome, cpf=cpf, email=email, senha=senha_hash)
+        # Create Inactive Client
+        new_cliente = Cliente(
+            nome=nome,
+            cpf=cpf,
+            email=email,
+            senha=senha_hash,
+            is_active=False # Wait for email verification
+        )
         db.session.add(new_cliente)
-        db.session.flush() # flush to get id_cliente
+        db.session.flush()
 
-        # Create Account
+        # Create Account & Card (Inactive state handled by user login block? No, just create them)
+        # Random initial balance between 100 and 10000
+        saldo_inicial = Decimal(random.uniform(100, 10000)).quantize(Decimal('0.01'))
+
         new_conta = Conta(
             id_cliente=new_cliente.id_cliente,
-            saldo=0.00,
+            saldo=saldo_inicial,
             data_abertura=date.today(),
             tipo_conta='Corrente'
         )
@@ -134,14 +146,15 @@ def cadastrar_cliente():
 
         db.session.commit()
 
+        # Send Verification Email
+        send_verification_email(email, 'register')
+
+        # Store email in session for the next step
+        session['pending_email'] = email
+
         return jsonify({
-            'message': 'Cliente, conta e cartão cadastrados com sucesso!',
-            'id_cliente': new_cliente.id_cliente,
-            'tipo_conta': new_conta.tipo_conta,
-            'data_abertura': str(new_conta.data_abertura),
-            'numero_cartao': numero_cartao,
-            'validade': validade,
-            'cvv': cvv
+            'message': 'Cadastro realizado! Verifique seu email para ativar a conta.',
+            'redirect': url_for('verificar_email')
         })
 
     except IntegrityError:
@@ -411,7 +424,7 @@ def sucesso():
 
 
 @app.route('/login', methods=['GET', 'POST'])
-@limiter.limit("5 per minute")
+@limiter.limit("10 per minute")
 def login():
     if current_user.is_authenticated:
         return redirect(url_for('index'))
@@ -423,12 +436,80 @@ def login():
         user = Cliente.query.filter_by(email=email).first()
 
         if user and check_password_hash(user.senha, password):
+            if user.is_active is False: # Check if None/True/False
+                flash('Conta não ativada. Verifique seu email.', 'warning')
+                session['pending_email'] = email
+                return redirect(url_for('verificar_email'))
+
             login_user(user)
             return redirect(url_for('index'))
         else:
             flash('Usuário ou senha inválidos.', 'error')
 
     return render_template('login.html')
+
+@app.route('/verificar-email', methods=['GET', 'POST'])
+def verificar_email():
+    email = session.get('pending_email')
+    if not email:
+        return redirect(url_for('login'))
+
+    if request.method == 'POST':
+        code = request.form.get('code')
+        if verify_code(email, code, 'register'):
+            user = Cliente.query.filter_by(email=email).first()
+            if user:
+                user.is_active = True
+                db.session.commit()
+                login_user(user)
+                session.pop('pending_email', None)
+                flash('Conta ativada com sucesso!', 'success')
+                return redirect(url_for('index'))
+        else:
+            flash('Código inválido ou expirado.', 'error')
+
+    return render_template('verify_email.html', email=email)
+
+@app.route('/esqueci-senha', methods=['GET', 'POST'])
+def esqueci_senha():
+    if request.method == 'POST':
+        email = request.form.get('email')
+        user = Cliente.query.filter_by(email=email).first()
+        if user:
+            send_verification_email(email, 'reset')
+            session['reset_email'] = email
+            flash('Código enviado para seu email.', 'info')
+            return redirect(url_for('redefinir_senha'))
+        else:
+            flash('Email não encontrado.', 'error')
+
+    return render_template('forgot_password.html')
+
+@app.route('/redefinir-senha', methods=['GET', 'POST'])
+def redefinir_senha():
+    email = session.get('reset_email')
+    if not email:
+        return redirect(url_for('esqueci_senha'))
+
+    if request.method == 'POST':
+        code = request.form.get('code')
+        password = request.form.get('password')
+        confirm = request.form.get('confirm_password')
+
+        if password != confirm:
+            flash('Senhas não conferem.', 'error')
+        elif verify_code(email, code, 'reset'):
+            user = Cliente.query.filter_by(email=email).first()
+            if user:
+                user.senha = generate_password_hash(password)
+                db.session.commit()
+                session.pop('reset_email', None)
+                flash('Senha redefinida com sucesso! Faça login.', 'success')
+                return redirect(url_for('login'))
+        else:
+            flash('Código inválido ou expirado.', 'error')
+
+    return render_template('reset_password.html', email=email)
 
 
 @app.route('/saldo/<int:numero_conta>', methods=['GET'])

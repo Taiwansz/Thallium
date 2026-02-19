@@ -23,5 +23,16 @@ class Config:
     print(f"--> Using Database: {db_type}")
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
+    # Email Config
+    MAIL_SERVER = os.getenv('MAIL_SERVER', 'smtp.gmail.com')
+    MAIL_PORT = int(os.getenv('MAIL_PORT', 587))
+    MAIL_USE_TLS = os.getenv('MAIL_USE_TLS', 'true').lower() in ['true', 'on', '1']
+    MAIL_USERNAME = os.getenv('MAIL_USERNAME')
+    MAIL_PASSWORD = os.getenv('MAIL_PASSWORD')
+    MAIL_DEFAULT_SENDER = os.getenv('MAIL_DEFAULT_SENDER', 'noreply@thalium.com')
+    # Debug: Print email to console if no password set (dev mode)
+    if not MAIL_PASSWORD:
+        MAIL_BACKEND = 'console'
+
     # Log the database type (masking credentials)
     print(f"DEBUG: Using Database URI: {SQLALCHEMY_DATABASE_URI.split('@')[-1] if '@' in SQLALCHEMY_DATABASE_URI else SQLALCHEMY_DATABASE_URI}")
