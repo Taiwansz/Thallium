@@ -10,3 +10,5 @@ flask-marshmallow
 marshmallow-sqlalchemy
 flasgger
 gunicorn
+psycopg2-binary
+Flask-Mail

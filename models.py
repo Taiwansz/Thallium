@@ -10,11 +10,20 @@ class Cliente(db.Model, UserMixin):
 
     def get_id(self):
         return str(self.id_cliente)
+
+    @property
+    def avatar_url(self):
+        # Gravatar logic
+        import hashlib
+        email_hash = hashlib.md5(self.email.lower().encode('utf-8')).hexdigest()
+        return f"https://www.gravatar.com/avatar/{email_hash}?d=identicon&s=200"
+
     nome = db.Column(db.String(100), nullable=False)
     email = db.Column(db.String(100), unique=True)
     cpf = db.Column(db.String(11), unique=True, nullable=False)
     senha = db.Column(db.String(255), nullable=False)
     senha_transacao = db.Column(db.String(255), nullable=True) # 4-digit PIN
+    is_active = db.Column(db.Boolean, default=True) # Changed default to True for existing users, False for new logic
 
     contas = relationship('Conta', backref='cliente', lazy=True)
     cartoes = relationship('Cartao', backref='cliente', lazy=True)
@@ -96,3 +105,13 @@ class AuditLog(db.Model):
     details = db.Column(db.Text, nullable=True)
     ip_address = db.Column(db.String(50))
     timestamp = db.Column(db.DateTime, default=datetime.utcnow)
+
+class VerificationCode(db.Model):
+    __tablename__ = 'verification_codes'
+    id = db.Column(db.Integer, primary_key=True)
+    email = db.Column(db.String(100), nullable=False)
+    code = db.Column(db.String(6), nullable=False)
+    type = db.Column(db.String(20), nullable=False) # 'register', 'reset'
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    expires_at = db.Column(db.DateTime, nullable=False)
+    used = db.Column(db.Boolean, default=False)

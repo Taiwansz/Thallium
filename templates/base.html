@@ -37,8 +37,10 @@
                     <span class="name">{{ current_user.nome }}</span>
                     <span class="role">Conta Premium</span>
                 </div>
-                <div class="user-avatar">
-                    <i class="fas fa-user"></i>
+                <div class="user-avatar" style="background-image: url('{{ current_user.avatar_url }}'); background-size: cover;">
+                    {% if not current_user.avatar_url %}
+                        <i class="fas fa-user"></i>
+                    {% endif %}
                 </div>
                 <a href="{{ url_for('logout') }}" class="ml-2 text-muted" title="Sair"><i class="fas fa-sign-out-alt"></i></a>
             </div>
