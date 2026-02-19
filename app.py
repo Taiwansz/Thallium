@@ -37,6 +37,23 @@ ma.init_app(app)
 swagger.init_app(app)
 mail.init_app(app)
 
+# Auto-migration fallback for SQLite (Render ephemeral FS)
+from sqlalchemy import inspect
+from flask_migrate import upgrade
+
+with app.app_context():
+    try:
+        inspector = inspect(db.engine)
+        if not inspector.has_table("Clientes"):
+            print("--> Tables not found. Running auto-migration...")
+            upgrade()
+            print("--> Migration complete.")
+            # Verify
+            inspector = inspect(db.engine)
+            print(f"--> Tables now: {inspector.get_table_names()}")
+    except Exception as e:
+        print(f"--> Auto-migration failed or skipped: {e}")
+
 login_manager = LoginManager()
 login_manager.init_app(app)
 login_manager.login_view = 'login'
