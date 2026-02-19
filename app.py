@@ -22,6 +22,13 @@ app.cli.add_command(yield_daily_command)
 app.cli.add_command(seed_admin_command)
 app.config.from_object(Config)
 
+# Ensure instance folder exists for SQLite fallback
+import os
+try:
+    os.makedirs(app.instance_path)
+except OSError:
+    pass
+
 csrf = CSRFProtect(app)
 db.init_app(app)
 migrate.init_app(app, db)
