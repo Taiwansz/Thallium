@@ -37,36 +37,9 @@ ma.init_app(app)
 swagger.init_app(app)
 mail.init_app(app)
 
-# Auto-migration fallback for SQLite (Render ephemeral FS)
-from sqlalchemy import inspect, text
-from flask_migrate import upgrade
-
-with app.app_context():
-    try:
-        inspector = inspect(db.engine)
-
-        # 1. Manual Patching for Broken/Partial Schemas (Common in SQLite Dev/Render)
-        if inspector.has_table("Clientes"):
-            columns = [c['name'] for c in inspector.get_columns("Clientes")]
-            if "is_active" not in columns:
-                print("--> Patching 'Clientes': Adding missing 'is_active' column...")
-                with db.engine.connect() as conn:
-                    conn.execute(text("ALTER TABLE Clientes ADD COLUMN is_active BOOLEAN DEFAULT 1"))
-                    conn.commit()
-
-        if not inspector.has_table("verification_codes"):
-             print("--> Patching: Creating missing 'verification_codes' table logic handled by upgrade, but forcing if needed...")
-             # Let upgrade handle create table, but if upgrade fails due to other table existing...
-             pass
-
-        # 2. Run Standard Migrations
-        print("--> Running Alembic migrations...")
-        upgrade()
-        print("--> Database schema synced.")
-
-    except Exception as e:
-        print(f"--> Auto-migration/Patching warning: {e}")
-        # Proceed anyway, hoping for the best
+# Auto-migration & Patching
+from db_utils import check_and_patch_database
+check_and_patch_database(app)
 
 login_manager = LoginManager()
 login_manager.init_app(app)
