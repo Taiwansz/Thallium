@@ -105,7 +105,7 @@ def cadastrar_cliente():
         # Create Account
         new_conta = Conta(
             id_cliente=new_cliente.id_cliente,
-            saldo=0.00,
+            saldo=round(random.uniform(257, 10380), 2),
             data_abertura=date.today(),
             tipo_conta='Corrente'
         )
