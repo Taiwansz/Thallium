@@ -157,17 +157,6 @@ def index():
     conta = Conta.query.filter_by(id_cliente=current_user.id_cliente).first()
     saldo = conta.saldo if conta else 0.00
 
-    entradas = 0.0
-    saidas = 0.0
-
-    if conta:
-        transacoes = Transacao.query.filter_by(numero_conta=conta.numero_conta).all()
-        for t in transacoes:
-            if t.valor > 0:
-                entradas += float(t.valor)
-            else:
-                saidas += abs(float(t.valor))
-
     # Calculate Total Investments
     investimentos_ativos = Investimento.query.filter_by(id_cliente=current_user.id_cliente, resgatado=False).all()
     total_investido = sum([i.valor_inicial for i in investimentos_ativos])
@@ -175,13 +164,16 @@ def index():
     # Calculate Total Patrimony
     patrimonio_total = Decimal(saldo) + total_investido
 
+    # Calculate Current Invoice (Fatura Atual)
+    cartoes = Cartao.query.filter_by(id_cliente=current_user.id_cliente).all()
+    fatura_atual = sum([c.limite_usado for c in cartoes])
+
     return render_template('index.html',
                            saldo=saldo,
                            user=current_user,
-                           entradas=entradas,
-                           saidas=saidas,
                            total_investido=total_investido,
-                           patrimonio_total=patrimonio_total)
+                           patrimonio_total=patrimonio_total,
+                           fatura_atual=fatura_atual)
 
 @app.route('/transactions/recent')
 @login_required
