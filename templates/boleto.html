@@ -5,6 +5,9 @@
     <div class="col-md-6">
         <div class="content-card">
             <h2 class="text-center mb-4">Pagamento de Boleto</h2>
+            <div class="mb-3">
+                <small class="text-muted">Saldo disponível: <strong class="text-success">{{ saldo | currency }}</strong></small>
+            </div>
             <form method="POST" action="{{ url_for('pagamento_boleto') }}">
                 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
                 <div class="form-group">
