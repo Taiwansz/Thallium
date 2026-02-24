@@ -5,6 +5,9 @@
     <div class="col-md-6">
         <div class="content-card">
             <h2 class="text-center mb-4">Simulação de Empréstimo</h2>
+            <div class="mb-3">
+                <small class="text-muted">Saldo atual: <strong class="text-success">{{ saldo | currency }}</strong></small>
+            </div>
             <form method="POST" action="{{ url_for('emprestimo') }}">
                 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
                 <div class="form-group">

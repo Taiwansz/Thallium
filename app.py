@@ -157,17 +157,6 @@ def index():
     conta = Conta.query.filter_by(id_cliente=current_user.id_cliente).first()
     saldo = conta.saldo if conta else 0.00
 
-    entradas = 0.0
-    saidas = 0.0
-
-    if conta:
-        transacoes = Transacao.query.filter_by(numero_conta=conta.numero_conta).all()
-        for t in transacoes:
-            if t.valor > 0:
-                entradas += float(t.valor)
-            else:
-                saidas += abs(float(t.valor))
-
     # Calculate Total Investments
     investimentos_ativos = Investimento.query.filter_by(id_cliente=current_user.id_cliente, resgatado=False).all()
     total_investido = sum([i.valor_inicial for i in investimentos_ativos])
@@ -175,13 +164,16 @@ def index():
     # Calculate Total Patrimony
     patrimonio_total = Decimal(saldo) + total_investido
 
+    # Calculate Current Invoice (Fatura Atual)
+    cartoes = Cartao.query.filter_by(id_cliente=current_user.id_cliente).all()
+    fatura_atual = sum([c.limite_usado for c in cartoes])
+
     return render_template('index.html',
                            saldo=saldo,
                            user=current_user,
-                           entradas=entradas,
-                           saidas=saidas,
                            total_investido=total_investido,
-                           patrimonio_total=patrimonio_total)
+                           patrimonio_total=patrimonio_total,
+                           fatura_atual=fatura_atual)
 
 @app.route('/transactions/recent')
 @login_required
@@ -284,7 +276,9 @@ def transferir():
             flash(f'Erro na transferência: {str(e)}', 'error')
             return redirect(url_for('transferir'))
 
-    return render_template('transfer.html')
+    conta = Conta.query.filter_by(id_cliente=current_user.id_cliente).first()
+    saldo = conta.saldo if conta else 0.00
+    return render_template('transfer.html', saldo=saldo)
 
 
 @app.route('/historico')
@@ -364,7 +358,9 @@ def perfil():
 @app.route('/boleto')
 @login_required
 def pagar():
-    return render_template('boleto.html')
+    conta = Conta.query.filter_by(id_cliente=current_user.id_cliente).first()
+    saldo = conta.saldo if conta else 0.00
+    return render_template('boleto.html', saldo=saldo)
 
 
 @app.route('/pagamento_boleto', methods=['POST'])
@@ -472,7 +468,9 @@ def deposito():
         else:
              return jsonify({'message': 'Conta não encontrada.'}), 404
 
-    return render_template('deposito.html')
+    conta = Conta.query.filter_by(id_cliente=current_user.id_cliente).first()
+    saldo = conta.saldo if conta else 0.00
+    return render_template('deposito.html', saldo=saldo)
 
 
 @app.route('/cartoes')
@@ -688,7 +686,9 @@ def recarga():
             db.session.rollback()
             flash(f'Erro: {str(e)}', 'error')
 
-    return render_template('recarga.html')
+    conta = Conta.query.filter_by(id_cliente=current_user.id_cliente).first()
+    saldo = conta.saldo if conta else 0.00
+    return render_template('recarga.html', saldo=saldo)
 
 @app.route('/cartoes/desbloquear/<int:id_cartao>', methods=['POST'])
 @login_required
@@ -748,7 +748,9 @@ def saque():
         else:
             return jsonify({'message': 'Saldo insuficiente.'}), 400
 
-    return render_template('saque.html')
+    conta = Conta.query.filter_by(id_cliente=current_user.id_cliente).first()
+    saldo = conta.saldo if conta else 0.00
+    return render_template('saque.html', saldo=saldo)
 
 
 @app.route('/emprestimo', methods=['GET', 'POST'])
@@ -784,7 +786,9 @@ def emprestimo():
         else:
             return jsonify({'message': 'Conta não encontrada'}), 404
 
-    return render_template('emprestimo.html')
+    conta = Conta.query.filter_by(id_cliente=current_user.id_cliente).first()
+    saldo = conta.saldo if conta else 0.00
+    return render_template('emprestimo.html', saldo=saldo)
 
 
 @app.route('/emprestimo/confirmacao')
