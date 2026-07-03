@@ -1,7 +1,6 @@
 import unittest
 from app import app, db
 from models import Cliente, Conta
-from werkzeug.security import generate_password_hash
 from decimal import Decimal
 from datetime import date
 
