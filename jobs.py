@@ -3,7 +3,6 @@ from flask.cli import with_appcontext
 from extensions import db
 from models import Investimento, Conta
 from decimal import Decimal
-from datetime import datetime
 
 @click.command('yield_daily')
 @with_appcontext
