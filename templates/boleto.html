@@ -8,7 +8,7 @@
             <div class="mb-3">
                 <small class="text-muted">Saldo disponível: <strong class="text-success">{{ saldo | currency }}</strong></small>
             </div>
-            <form method="POST" action="{{ url_for('pagamento_boleto') }}">
+            <form method="POST" action="{{ url_for('transactions.pagamento_boleto') }}">
                 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
                 <div class="form-group">
                     <label for="valor">Valor do Boleto (R$)</label>

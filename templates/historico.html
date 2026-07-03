@@ -25,7 +25,7 @@
                                 <strong>{{ '+' if transacao.valor > 0 else '' }} {{ transacao.valor | currency }}</strong>
                             </td>
                             <td class="text-center">
-                                <a href="{{ url_for('download_recibo', id_transacao=transacao.id_transacao) }}" class="btn btn-sm btn-outline-info" title="Baixar Comprovante">
+                                <a href="{{ url_for('transactions.download_recibo', id_transacao=transacao.id_transacao) }}" class="btn btn-sm btn-outline-info" title="Baixar Comprovante">
                                     <i class="fas fa-file-pdf"></i>
                                 </a>
                             </td>
@@ -47,21 +47,21 @@
             <nav aria-label="Page navigation" class="mt-4">
                 <ul class="pagination justify-content-center">
                     <li class="page-item {% if not pagination.has_prev %}disabled{% endif %}">
-                        <a class="page-link" href="{{ url_for('historico', page=pagination.prev_num) }}" tabindex="-1">Anterior</a>
+                        <a class="page-link" href="{{ url_for('transactions.historico', page=pagination.prev_num) }}" tabindex="-1">Anterior</a>
                     </li>
                     {% for page_num in pagination.iter_pages(left_edge=1, right_edge=1, left_current=1, right_current=2) %}
                         {% if page_num %}
                             {% if pagination.page == page_num %}
                             <li class="page-item active"><span class="page-link">{{ page_num }}</span></li>
                             {% else %}
-                            <li class="page-item"><a class="page-link" href="{{ url_for('historico', page=page_num) }}">{{ page_num }}</a></li>
+                            <li class="page-item"><a class="page-link" href="{{ url_for('transactions.historico', page=page_num) }}">{{ page_num }}</a></li>
                             {% endif %}
                         {% else %}
                             <li class="page-item disabled"><span class="page-link">...</span></li>
                         {% endif %}
                     {% endfor %}
                     <li class="page-item {% if not pagination.has_next %}disabled{% endif %}">
-                        <a class="page-link" href="{{ url_for('historico', page=pagination.next_num) }}">Próxima</a>
+                        <a class="page-link" href="{{ url_for('transactions.historico', page=pagination.next_num) }}">Próxima</a>
                     </li>
                 </ul>
             </nav>

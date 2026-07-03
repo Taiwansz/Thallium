@@ -32,3 +32,20 @@ def gerar_recibo_pdf(transacao, cliente):
     pdf_output.seek(0)
 
     return send_file(pdf_output, as_attachment=True, download_name=f"comprovante_{transacao.id_transacao}.pdf", mimetype='application/pdf')
+
+def validate_cpf(cpf):
+    # Basic format check
+    cpf = ''.join(filter(str.isdigit, cpf))
+    if len(cpf) != 11:
+        return False
+    if cpf == cpf[0] * 11:
+        return False
+
+    # Check digits
+    for i in range(9, 11):
+        val = sum((int(cpf[num]) * ((i + 1) - num) for num in range(0, i)))
+        digit = ((val * 10) % 11) % 10
+        if digit != int(cpf[i]):
+            return False
+    return True
+

@@ -8,7 +8,7 @@
             <div class="mb-3">
                 <small class="text-muted">Saldo disponível: <strong class="text-success">{{ saldo | currency }}</strong></small>
             </div>
-            <form method="POST" action="{{ url_for('saque') }}">
+            <form method="POST" action="{{ url_for('transactions.saque') }}">
                 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
                 <div class="form-group">
                     <label for="valor">Valor (R$)</label>

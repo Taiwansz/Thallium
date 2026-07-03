@@ -25,7 +25,7 @@
                 <button type="submit" class="btn btn-primary btn-block">Cadastrar</button>
             </form>
             <div class="text-center mt-3">
-                <span>Já tem uma conta? <a href="{{ url_for('login') }}">Entre</a></span>
+                <span>Já tem uma conta? <a href="{{ url_for('auth.login') }}">Entre</a></span>
             </div>
         </div>
     </div>
@@ -52,7 +52,7 @@
             const data = await response.json();
             if (response.ok) {
                 alert(data.message);
-                window.location.href = "{{ url_for('login') }}";
+                window.location.href = "{{ url_for('auth.login') }}";
             } else {
                 alert(data.message);
             }

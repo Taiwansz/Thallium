@@ -8,7 +8,7 @@
             <div class="mb-3">
                 <small class="text-muted">Saldo atual: <strong class="text-success">{{ saldo | currency }}</strong></small>
             </div>
-            <form method="POST" action="{{ url_for('emprestimo') }}">
+            <form method="POST" action="{{ url_for('loans.emprestimo') }}">
                 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
                 <div class="form-group">
                     <label for="valor_emprestimo">Valor Desejado (R$)</label>

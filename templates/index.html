@@ -92,7 +92,7 @@
             <h5 class="mb-4">Ações Rápidas</h5>
             <div class="row">
                 <div class="col-6 col-md-2 mb-3 mb-md-0">
-                    <a href="{{ url_for('transferir') }}" class="action-btn">
+                    <a href="{{ url_for('transactions.transferir') }}" class="action-btn">
                         <div class="action-icon bg-light-green"><i class="fas fa-exchange-alt"></i></div>
                         <span class="action-label">Transferir</span>
                         <span class="action-desc">Envie dinheiro</span>
@@ -106,28 +106,28 @@
                     </a>
                 </div>
                 <div class="col-6 col-md-2 mb-3 mb-md-0">
-                    <a href="{{ url_for('investimentos') }}" class="action-btn">
+                    <a href="{{ url_for('investments.investimentos') }}" class="action-btn">
                         <div class="action-icon bg-light-green"><i class="fas fa-chart-bar"></i></div>
                         <span class="action-label">Investir</span>
                         <span class="action-desc">Aplique agora</span>
                     </a>
                 </div>
                 <div class="col-6 col-md-2 mb-3 mb-md-0">
-                    <a href="{{ url_for('cartoes') }}" class="action-btn">
+                    <a href="{{ url_for('cards.cartoes') }}" class="action-btn">
                         <div class="action-icon bg-light-green"><i class="fas fa-credit-card"></i></div>
                         <span class="action-label">Cartões</span>
                         <span class="action-desc">Gerencie</span>
                     </a>
                 </div>
                 <div class="col-6 col-md-2 mb-3 mb-md-0">
-                    <a href="{{ url_for('historico') }}" class="action-btn">
+                    <a href="{{ url_for('transactions.historico') }}" class="action-btn">
                         <div class="action-icon bg-light-green"><i class="fas fa-file-invoice-dollar"></i></div>
                         <span class="action-label">Extrato</span>
                         <span class="action-desc">Movimentações</span>
                     </a>
                 </div>
                 <div class="col-6 col-md-2 mb-3 mb-md-0">
-                    <a href="{{ url_for('investimentos') }}" class="action-btn"> <!-- Redirect to investments for now -->
+                    <a href="{{ url_for('investments.investimentos') }}" class="action-btn"> <!-- Redirect to investments for now -->
                         <div class="action-icon bg-light-green"><i class="fas fa-piggy-bank"></i></div>
                         <span class="action-label">Poupar</span>
                         <span class="action-desc">Metas</span>
@@ -163,11 +163,11 @@
         <div class="content-card h-100">
             <div class="d-flex justify-content-between align-items-center mb-4">
                 <h5 class="mb-0">Transações Recentes</h5>
-                <a href="{{ url_for('historico') }}" class="text-success small font-weight-bold">Ver todas</a>
+                <a href="{{ url_for('transactions.historico') }}" class="text-success small font-weight-bold">Ver todas</a>
             </div>
 
             <div id="recent-transactions"
-                 hx-get="{{ url_for('recent_transactions') }}"
+                 hx-get="{{ url_for('transactions.recent_transactions') }}"
                  hx-trigger="load, every 30s">
                  <!-- Content loaded via HTMX -->
                  <div class="text-center py-4 text-muted">Carregando...</div>

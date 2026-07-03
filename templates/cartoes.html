@@ -83,12 +83,12 @@
                         <!-- Actions -->
                         <div class="btn-group w-100 mb-2">
                              {% if cartao.bloqueado %}
-                                <form action="{{ url_for('desbloquear_cartao', id_cartao=cartao.id) }}" method="POST" class="w-50 mr-1">
+                                <form action="{{ url_for('cards.desbloquear_cartao', id_cartao=cartao.id) }}" method="POST" class="w-50 mr-1">
                                     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
                                     <button type="submit" class="btn btn-warning btn-block"><i class="fas fa-lock-open"></i> Desbloquear</button>
                                 </form>
                             {% else %}
-                                <form action="{{ url_for('bloquear_cartao', id_cartao=cartao.id) }}" method="POST" class="w-50 mr-1">
+                                <form action="{{ url_for('cards.bloquear_cartao', id_cartao=cartao.id) }}" method="POST" class="w-50 mr-1">
                                     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
                                     <button type="submit" class="btn btn-outline-danger btn-block"><i class="fas fa-lock"></i> Bloquear</button>
                                 </form>
@@ -114,7 +114,7 @@
                                 <div class="modal-body">
                                     <p>Total da Fatura: <strong>{{ cartao.limite_usado | currency }}</strong></p>
                                     <p class="small text-muted">O pagamento liberará o limite instantaneamente.</p>
-                                    <form action="{{ url_for('pagar_fatura', id_cartao=cartao.id) }}" method="POST">
+                                    <form action="{{ url_for('cards.pagar_fatura', id_cartao=cartao.id) }}" method="POST">
                                         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
                                         <div class="form-group">
                                             <label>Valor a pagar</label>
