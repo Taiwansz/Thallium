@@ -1,0 +1,14 @@
+
+> frontend-temp@0.1.0 dev
+> next dev
+
+▲ Next.js 16.2.10 (Turbopack)
+- Local:         http://localhost:3000
+- Network:       http://192.168.0.2:3000
+- Environments: .env
+✓ Ready in 1323ms
+
+○ Compiling / ...
+ GET / 307 in 5.8s (next.js: 5.4s, application-code: 353ms)
+ GET /cadastro 200 in 2.7s (next.js: 2.4s, application-code: 238ms)
+ GET /login 200 in 1643ms (next.js: 1539ms, application-code: 104ms)
