@@ -1,0 +1,107 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Cliente {
+  id_cliente       Int      @id @default(autoincrement())
+  nome             String
+  email            String?  @unique
+  cpf              String   @unique
+  senha            String
+  senha_transacao  String?
+
+  contas           Conta[]
+  cartoes          Cartao[]
+  chaves_pix       ChavePix[]
+  investimentos    Investimento[]
+  audit_logs       AuditLog[]
+}
+
+model Conta {
+  numero_conta     Int      @id @default(autoincrement())
+  id_cliente       Int
+  saldo            Float    @default(0.00)
+  data_abertura    DateTime
+  tipo_conta       String
+
+  cliente          Cliente  @relation(fields: [id_cliente], references: [id_cliente], onDelete: Cascade)
+  transacoes       Transacao[]
+  emprestimos      Emprestimo[]
+}
+
+model Transacao {
+  id_transacao     Int      @id @default(autoincrement())
+  numero_conta     Int
+  tipo_transacao   String
+  valor            Float
+  data_transacao   DateTime @default(now())
+  descricao        String?
+  categoria        String   @default("Outros")
+
+  conta            Conta    @relation(fields: [numero_conta], references: [numero_conta], onDelete: Cascade)
+}
+
+model Emprestimo {
+  id_emprestimo    Int      @id @default(autoincrement())
+  numero_conta     Int
+  valor_emprestimo Float
+  juros            Float
+  prazo            Int
+  data_emprestimo  DateTime
+  data_vencimento  DateTime
+  status           String   @default("pendente")
+
+  conta            Conta    @relation(fields: [numero_conta], references: [numero_conta], onDelete: Cascade)
+}
+
+model Cartao {
+  id               Int      @id @default(autoincrement())
+  numero           String   @unique
+  validade         String
+  cvv              String
+  id_cliente       Int
+  bloqueado        Boolean  @default(false)
+  limite_total     Float    @default(15000.00)
+  limite_usado     Float    @default(0.00)
+  fatura_fechada   Boolean  @default(false)
+  data_vencimento  DateTime @default(now())
+
+  cliente          Cliente  @relation(fields: [id_cliente], references: [id_cliente], onDelete: Cascade)
+}
+
+model ChavePix {
+  id               Int      @id @default(autoincrement())
+  tipo             String
+  chave            String   @unique
+  id_cliente       Int
+
+  cliente          Cliente  @relation(fields: [id_cliente], references: [id_cliente], onDelete: Cascade)
+}
+
+model Investimento {
+  id               Int      @id @default(autoincrement())
+  id_cliente       Int
+  tipo             String
+  valor_inicial    Float
+  data_aplicacao   DateTime @default(now())
+  taxa_anual       Float    @default(12.0)
+  resgatado        Boolean  @default(false)
+
+  cliente          Cliente  @relation(fields: [id_cliente], references: [id_cliente], onDelete: Cascade)
+}
+
+model AuditLog {
+  id               Int      @id @default(autoincrement())
+  id_cliente       Int
+  action           String
+  details          String?
+  ip_address       String?
+  timestamp        DateTime @default(now())
+
+  cliente          Cliente  @relation(fields: [id_cliente], references: [id_cliente], onDelete: Cascade)
+}
