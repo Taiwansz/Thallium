@@ -7,9 +7,11 @@ from flask_login import LoginManager, current_user, login_required
 from flask_wtf.csrf import CSRFProtect
 from jobs import yield_daily_command
 
-app = Flask(__name__)
+import os
+app = Flask(__name__, instance_path='/tmp')
 app.cli.add_command(yield_daily_command)
 app.config.from_object(Config)
+
 
 csrf = CSRFProtect(app)
 db.init_app(app)
