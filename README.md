@@ -1,36 +1,221 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 🌌 Thallium Ledger Core
 
-## Getting Started
+[![Next.js 16](https://img.shields.io/badge/Next.js-16.2.10-000000?style=flat-square&logo=next.js&logoColor=white)](https://nextjs.org/)
+[![Tailwind CSS v4](https://img.shields.io/badge/Tailwind_CSS-v4.0.0-38bdf8?style=flat-square&logo=tailwind-css&logoColor=white)](https://tailwindcss.com/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.x-3178c6?style=flat-square&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
+[![Supabase](https://img.shields.io/badge/Supabase-Database-3ecf8e?style=flat-square&logo=supabase&logoColor=white)](https://supabase.com/)
+[![Playwright](https://img.shields.io/badge/Playwright-E2E-2e8b57?style=flat-square&logo=playwright&logoColor=white)](https://playwright.dev/)
+[![License](https://img.shields.io/badge/License-MIT-green?style=flat-square)](LICENSE)
 
-First, run the development server:
+Thallium is an enterprise-grade digital ledger bank infrastructure designed with clinical precision and high-integrity transactional mechanics. Engineered with Next.js 16 App Router, Tailwind CSS v4, and Supabase (Postgres), Thallium represents a robust double-entry system leveraging strict Row Level Security (RLS) policies and transaction processing executed entirely via secure database RPC functions.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+---
+
+## 🏗️ System Architecture
+
+Thallium routes all critical financial transactions through atomic database-level RPC procedures to eliminate race conditions, prevent negative balance anomalies, and ensure audit logs are generated synchronously.
+
+```mermaid
+graph TD
+    ClientApp[Client Web App] -->|Next.js 16 / React 19 Client| API[Supabase Client Auth & Session]
+    API -->|Secure TLS Hook| DB[(PostgreSQL Database)]
+    
+    subgraph PostgreSQL Core
+        DB -->|Row-Level Security / auth.uid| RLS[RLS Evaluation]
+        RLS -->|Verified User| SQL_Tables[Tables: Clientes, Contas, Cartões, etc.]
+        
+        RLS -->|Invokes RPC| RPC{Secure Database RPCs}
+        RPC -->|realizar_deposito| Deposit[Deposit Funds]
+        RPC -->|realizar_saque| Withdraw[Withdraw Funds]
+        RPC -->|transferir_dinheiro| Transfer[Transfer to Email]
+        RPC -->|realizar_pix| Pix[Pix Key Transfer]
+        RPC -->|pagar_fatura| CardInvoice[Pay Card Invoice]
+        RPC -->|investir_recursos| Invest[Invest Funds]
+        RPC -->|resgatar_investimento| Redeem[Redeem Yields]
+        RPC -->|solicitar_emprestimo| Loan[Request Loan]
+        
+        Deposit & Withdraw & Transfer & Pix & CardInvoice & Invest & Redeem & Loan -->|Writes to Ledger| TransTable[(Table: Transações)]
+        Deposit & Withdraw & Transfer & Pix & CardInvoice & Invest & Redeem & Loan -->|Synchronous Log| AuditTable[(Table: AuditLogs)]
+    end
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+---
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## 🗄️ Database Schema & Relations
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+The schema, defined in [migrations/20260710000000_create_thallium_tables.sql](file:///root/Thallium/supabase/migrations/20260710000000_create_thallium_tables.sql), is built for high compliance and performance. It consists of the following key tables and relations:
 
-## Learn More
+### 1. `clientes`
+Links authentication credentials directly to user profiles.
+*   **id_cliente** `UUID` (Primary Key, references `auth.users` on cascade delete)
+*   **nome** `TEXT` (Not Null)
+*   **email** `TEXT` (Unique, Not Null)
+*   **cpf** `VARCHAR(11)` (Unique, Not Null)
+*   **senha_transacao** `TEXT` (Hashed 4-digit PIN for transactions)
+*   **created_at** `TIMESTAMP WITH TIME ZONE`
 
-To learn more about Next.js, take a look at the following resources:
+### 2. `contas`
+Tracks balances and accounts types. Auto-increments from `100001` upwards.
+*   **numero_conta** `SERIAL` (Primary Key)
+*   **id_cliente** `UUID` (References `clientes.id_cliente` on cascade delete)
+*   **saldo** `NUMERIC(15,2)` (Defaults to `0.00`, strictly verified `>= 0.00`)
+*   **data_abertura** `DATE` (Defaults to current date)
+*   **tipo_conta** `TEXT` (Constrained to `'Corrente'`, `'Poupança'`)
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+### 3. `transacoes`
+The core digital ledger storing debit/credit transactions.
+*   **id_transacao** `BIGSERIAL` (Primary Key)
+*   **numero_conta** `INT` (References `contas.numero_conta` on cascade delete)
+*   **tipo_transacao** `TEXT` (e.g., `'Depósito'`, `'Saque'`, `'Transferência Enviada'`, `'Pix Enviado'`)
+*   **valor** `NUMERIC(15,2)` (Signed amounts; negative for debits, positive for credits)
+*   **data_transacao** `TIMESTAMP WITH TIME ZONE`
+*   **descricao** `TEXT`
+*   **categoria** `TEXT` (Defaults to `'Outros'`)
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+### 4. `cartoes`
+Supports virtual and physical cards with integrated credit limits.
+*   **id** `UUID` (Primary Key)
+*   **numero** `VARCHAR(16)` (Unique)
+*   **validade** `VARCHAR(5)` (MM/YY)
+*   **cvv** `VARCHAR(3)`
+*   **id_cliente** `UUID` (References `clientes.id_cliente` on cascade delete)
+*   **bloqueado** `BOOLEAN` (Defaults to `false`)
+*   **limite_total** `NUMERIC(15,2)` (Defaults to `15000.00`)
+*   **limite_usado** `NUMERIC(15,2)` (Defaults to `0.00`)
+*   **fatura_fechada** `BOOLEAN` (Defaults to `false`)
+*   **data_vencimento** `DATE`
 
-## Deploy on Vercel
+### 5. `chaves_pix`
+Handles unique Pix address keys for instant transfers.
+*   **id** `UUID` (Primary Key)
+*   **tipo** `TEXT` (Constrained to `'cpf'`, `'email'`, `'aleatoria'`)
+*   **chave** `TEXT` (Unique)
+*   **id_cliente** `UUID` (References `clientes.id_cliente` on cascade delete)
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+### 6. `investimentos`
+Simulates fixed income assets with interest yield formulas on redemption.
+*   **id** `UUID` (Primary Key)
+*   **id_cliente** `UUID` (References `clientes.id_cliente` on cascade delete)
+*   **tipo** `TEXT` (Constrained to `'CDB'`, `'LCI'`, `'Tesouro'`)
+*   **valor_inicial** `NUMERIC(15,2)` (Min `100.00`)
+*   **data_aplicacao** `TIMESTAMP WITH TIME ZONE`
+*   **taxa_anual** `NUMERIC(5,2)`
+*   **resgatado** `BOOLEAN` (Defaults to `false`)
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+### 7. `emprestimos`
+Tracks capital financing requests.
+*   **id_emprestimo** `UUID` (Primary Key)
+*   **numero_conta** `INT` (References `contas.numero_conta` on cascade delete)
+*   **valor_emprestimo** `NUMERIC(15,2)`
+*   **juros** `NUMERIC(5,2)` (Defaults to `5.00%` monthly)
+*   **prazo** `INT` (Months)
+*   **data_emprestimo** `DATE`
+*   **status** `TEXT` (Constrained to `'pendente'`, `'aprovado'`, `'negado'`)
+
+### 8. `audit_logs`
+Automated auditing capturing all ledger mutating events.
+*   **id** `BIGSERIAL` (Primary Key)
+*   **id_cliente** `UUID` (References `clientes.id_cliente`)
+*   **action** `TEXT`
+*   **details** `TEXT`
+*   **ip_address** `TEXT`
+*   **timestamp** `TIMESTAMP WITH TIME ZONE`
+
+---
+
+## 🎨 Visual Design Principles
+
+Thallium enforces a strict developer-centric visual theme (documented in [docs/DESIGN.md](file:///root/Thallium/docs/DESIGN.md)):
+-   **Canvas Base:** Zinc-950 (`#09090b`) canvas coupled with Zinc-900 surface panels.
+-   **Accents:** Single-accent Emerald-500 (`#10b981`) represents security, positive balances, and main actions.
+-   **Alerts:** Rose-600 (`#e11d48`) triggers error, overdraft warnings, and delete flows.
+-   **Typography:** Monospace numeric values (`Geist Mono` or similar fallbacks) are mandatory across dashboards, ledgers, and transactions.
+-   **Aesthetic Rules:** Flat surfaces only. No heavy shadows, gradient glows, or emojis in system labels.
+
+---
+
+## 🛠️ Local Development Setup
+
+To run Thallium locally, verify you have **Yarn** and **Docker** (for local Supabase development) installed.
+
+### 1. Install Dependencies
+```bash
+yarn install
+```
+
+### 2. Configure Environment
+Create a copy of `.env.local` based on standard configurations:
+```env
+NEXT_PUBLIC_SUPABASE_URL=http://localhost:54321
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your-supabase-anon-key
+```
+
+### 3. Supabase Local Configuration
+Initialize Supabase locally and run migrations:
+```bash
+# Log in to Supabase CLI (if using remote instances)
+yarn supabase login
+
+# Start local Supabase Docker container environment
+yarn supabase start
+
+# Apply schema migrations
+yarn supabase db reset
+```
+
+### 4. Running the Development Server
+```bash
+yarn dev
+```
+Open [http://localhost:3000](http://localhost:3000) to view your local instance.
+
+---
+
+## 🧪 Testing Guide
+
+Thallium utilizes a dual-tier testing strategy combining fast unit tests with robust E2E validation.
+
+### 🧪 Unit & Integration Tests (Vitest)
+Unit tests evaluate helper methods, formatters, and client validation utilities in [src/lib/utils.ts](file:///root/Thallium/src/lib/utils.ts) (including CPF validators and PIN hashing).
+
+Run the unit test suite:
+```bash
+yarn test
+```
+
+### 🎭 End-to-End Tests (Playwright)
+E2E flows are located in [src/tests/e2e/bank.spec.ts](file:///root/Thallium/src/tests/e2e/bank.spec.ts) and run Chromium browsers to assert core navigation, authentication templates, and signup views.
+
+Run Playwright tests locally:
+```bash
+yarn test:e2e
+```
+
+To run Playwright tests in interactive UI mode:
+```bash
+yarn playwright test --ui
+```
+
+---
+
+## 📂 Project Structure
+
+```bash
+├── database/            # Database assets & configurations
+├── docs/                # Design & architecture documentation
+│   ├── DESIGN.md        # UX/UI system guidelines
+│   └── AGENTS.md        # Next.js workspace specifications
+├── public/              # Static files & assets
+├── src/
+│   ├── app/             # Next.js 16 App Router pages
+│   ├── components/      # UI component library (Button, Modal, Input, etc.)
+│   ├── features/        # Complex dashboard sub-views (Ledger, Loans, Cards)
+│   ├── hooks/           # custom React Hooks (useAuth)
+│   ├── lib/             # Utilities (utils.ts) & Supabase client config
+│   └── tests/           # Vitest and Playwright test files
+├── supabase/            # Local Supabase configurations
+│   ├── migrations/      # DB SQL schema migrations
+│   └── seed.sql         # Local DB seed entries
+├── package.json         # Scripts and project configurations
+└── playwright.config.ts # Playwright settings
+```
