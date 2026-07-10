@@ -32,8 +32,10 @@
     "@types/react-dom": "^19",
     "eslint": "^9",
     "eslint-config-next": "16.2.10",
+    "supabase": "^2.109.1",
     "tailwindcss": "^4",
     "typescript": "^5",
+    "vercel": "^55.0.0",
     "vitest": "^4.1.10"
   }
 }

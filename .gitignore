@@ -46,3 +46,10 @@ next-env.d.ts
 /blob-report/
 /playwright/.cache/
 
+# scratch files
+/scratch/
+
+# supabase temp
+/supabase/.temp/
+
+
