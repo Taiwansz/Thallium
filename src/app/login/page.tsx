@@ -98,14 +98,24 @@ export default function LoginPage() {
                 disabled={isSubmitting}
                 {...register('email')}
               />
-              <Input
-                label="Senha de Acesso"
-                type="password"
-                placeholder="••••••••"
-                error={errors.password?.message}
-                disabled={isSubmitting}
-                {...register('password')}
-              />
+              <div>
+                <Input
+                  label="Senha de Acesso"
+                  type="password"
+                  placeholder="••••••••"
+                  error={errors.password?.message}
+                  disabled={isSubmitting}
+                  {...register('password')}
+                />
+                <div className="flex justify-end mt-2">
+                  <Link
+                    href="/recuperar-senha"
+                    className="text-xs text-zinc-400 hover:text-primary transition-colors"
+                  >
+                    Esqueci minha senha
+                  </Link>
+                </div>
+              </div>
               
               <Button type="submit" className="w-full mt-2" isLoading={isSubmitting}>
                 Acessar Painel
