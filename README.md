@@ -1,4 +1,4 @@
-# 🌌 Thallium Ledger Core
+# Thallium Ledger Core
 
 [![Next.js 16](https://img.shields.io/badge/Next.js-16.2.10-000000?style=flat-square&logo=next.js&logoColor=white)](https://nextjs.org/)
 [![Tailwind CSS v4](https://img.shields.io/badge/Tailwind_CSS-v4.0.0-38bdf8?style=flat-square&logo=tailwind-css&logoColor=white)](https://tailwindcss.com/)
@@ -11,7 +11,7 @@ Thallium is an enterprise-grade digital ledger bank infrastructure designed with
 
 ---
 
-## 🏗️ System Architecture
+## System Architecture
 
 Thallium routes all critical financial transactions through atomic database-level RPC procedures to eliminate race conditions, prevent negative balance anomalies, and ensure audit logs are generated synchronously.
 
@@ -41,11 +41,11 @@ graph TD
 
 ---
 
-## 🗄️ Database Schema & Relations
+## Database Schema & Relations
 
-The schema, defined in [migrations/20260710000000_create_thallium_tables.sql](file:///root/Thallium/supabase/migrations/20260710000000_create_thallium_tables.sql), is built for high compliance and performance. It consists of the following key tables and relations:
+The schema, defined in `supabase/migrations/20260710000000_create_thallium_tables.sql`, is built for high compliance and performance. It consists of the following key tables and relations:
 
-### 1. `clientes`
+### 1. clientes
 Links authentication credentials directly to user profiles.
 *   **id_cliente** `UUID` (Primary Key, references `auth.users` on cascade delete)
 *   **nome** `TEXT` (Not Null)
@@ -54,7 +54,7 @@ Links authentication credentials directly to user profiles.
 *   **senha_transacao** `TEXT` (Hashed 4-digit PIN for transactions)
 *   **created_at** `TIMESTAMP WITH TIME ZONE`
 
-### 2. `contas`
+### 2. contas
 Tracks balances and accounts types. Auto-increments from `100001` upwards.
 *   **numero_conta** `SERIAL` (Primary Key)
 *   **id_cliente** `UUID` (References `clientes.id_cliente` on cascade delete)
@@ -62,7 +62,7 @@ Tracks balances and accounts types. Auto-increments from `100001` upwards.
 *   **data_abertura** `DATE` (Defaults to current date)
 *   **tipo_conta** `TEXT` (Constrained to `'Corrente'`, `'Poupança'`)
 
-### 3. `transacoes`
+### 3. transacoes
 The core digital ledger storing debit/credit transactions.
 *   **id_transacao** `BIGSERIAL` (Primary Key)
 *   **numero_conta** `INT` (References `contas.numero_conta` on cascade delete)
@@ -72,7 +72,7 @@ The core digital ledger storing debit/credit transactions.
 *   **descricao** `TEXT`
 *   **categoria** `TEXT` (Defaults to `'Outros'`)
 
-### 4. `cartoes`
+### 4. cartoes
 Supports virtual and physical cards with integrated credit limits.
 *   **id** `UUID` (Primary Key)
 *   **numero** `VARCHAR(16)` (Unique)
@@ -85,14 +85,14 @@ Supports virtual and physical cards with integrated credit limits.
 *   **fatura_fechada** `BOOLEAN` (Defaults to `false`)
 *   **data_vencimento** `DATE`
 
-### 5. `chaves_pix`
+### 5. chaves_pix
 Handles unique Pix address keys for instant transfers.
 *   **id** `UUID` (Primary Key)
 *   **tipo** `TEXT` (Constrained to `'cpf'`, `'email'`, `'aleatoria'`)
 *   **chave** `TEXT` (Unique)
 *   **id_cliente** `UUID` (References `clientes.id_cliente` on cascade delete)
 
-### 6. `investimentos`
+### 6. investimentos
 Simulates fixed income assets with interest yield formulas on redemption.
 *   **id** `UUID` (Primary Key)
 *   **id_cliente** `UUID` (References `clientes.id_cliente` on cascade delete)
@@ -102,7 +102,7 @@ Simulates fixed income assets with interest yield formulas on redemption.
 *   **taxa_anual** `NUMERIC(5,2)`
 *   **resgatado** `BOOLEAN` (Defaults to `false`)
 
-### 7. `emprestimos`
+### 7. emprestimos
 Tracks capital financing requests.
 *   **id_emprestimo** `UUID` (Primary Key)
 *   **numero_conta** `INT` (References `contas.numero_conta` on cascade delete)
@@ -112,7 +112,7 @@ Tracks capital financing requests.
 *   **data_emprestimo** `DATE`
 *   **status** `TEXT` (Constrained to `'pendente'`, `'aprovado'`, `'negado'`)
 
-### 8. `audit_logs`
+### 8. audit_logs
 Automated auditing capturing all ledger mutating events.
 *   **id** `BIGSERIAL` (Primary Key)
 *   **id_cliente** `UUID` (References `clientes.id_cliente`)
@@ -123,20 +123,21 @@ Automated auditing capturing all ledger mutating events.
 
 ---
 
-## 🎨 Visual Design Principles
+## Visual Design Principles
 
-Thallium enforces a strict developer-centric visual theme (documented in [docs/DESIGN.md](file:///root/Thallium/docs/DESIGN.md)):
--   **Canvas Base:** Zinc-950 (`#09090b`) canvas coupled with Zinc-900 surface panels.
--   **Accents:** Single-accent Emerald-500 (`#10b981`) represents security, positive balances, and main actions.
--   **Alerts:** Rose-600 (`#e11d48`) triggers error, overdraft warnings, and delete flows.
--   **Typography:** Monospace numeric values (`Geist Mono` or similar fallbacks) are mandatory across dashboards, ledgers, and transactions.
--   **Aesthetic Rules:** Flat surfaces only. No heavy shadows, gradient glows, or emojis in system labels.
+Thallium enforces a premium developer-centric visual theme inspired by the chemical element Thallium (Tl, atomic number 81):
+-   **Canvas Base:** Absolute black background (`#090909`) with variations (`#121212` and `#1A1A1A`) to define cards, panels, and borders.
+-   **Accents:** Metallic details in champagne gold (`#D4AF6A`), deep gold (`#B8893C`), and metallic silver (`#B8BDC7`).
+-   **Alerts:** Rose-600 (`#e11d48`) triggers error states, overdraft warnings, and block/cancel operations.
+-   **Typography:** Bold rounded display headings via Sora font paired with clean Manrope body copy. Monospace values are enforced for numeric and tabular transactional data.
+-   **Curves and Radius:** Soft borders ranging from 16px to 24px (`radius: 1.25rem`) applied to cards, buttons, input fields, and overlays.
+-   **Materiality:** Subtle glassmorphic layers (`backdrop-filter`), specular gold sheen gradients, dynamically tilted 3D virtual credit cards, and responsive spring animations.
 
 ---
 
-## 🛠️ Local Development Setup
+## Local Development Setup
 
-To run Thallium locally, verify you have **Yarn** and **Docker** (for local Supabase development) installed.
+To run Thallium locally, verify you have Yarn and Docker (for local Supabase development) installed.
 
 ### 1. Install Dependencies
 ```bash
@@ -153,9 +154,6 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=your-supabase-anon-key
 ### 3. Supabase Local Configuration
 Initialize Supabase locally and run migrations:
 ```bash
-# Log in to Supabase CLI (if using remote instances)
-yarn supabase login
-
 # Start local Supabase Docker container environment
 yarn supabase start
 
@@ -167,24 +165,24 @@ yarn supabase db reset
 ```bash
 yarn dev
 ```
-Open [http://localhost:3000](http://localhost:3000) to view your local instance.
+Open http://localhost:3000 to view your local instance.
 
 ---
 
-## 🧪 Testing Guide
+## Testing Guide
 
 Thallium utilizes a dual-tier testing strategy combining fast unit tests with robust E2E validation.
 
-### 🧪 Unit & Integration Tests (Vitest)
-Unit tests evaluate helper methods, formatters, and client validation utilities in [src/lib/utils.ts](file:///root/Thallium/src/lib/utils.ts) (including CPF validators and PIN hashing).
+### Unit and Integration Tests (Vitest)
+Unit tests evaluate helper methods, formatters, and client validation utilities in `src/lib/utils.ts` (including CPF validators and PIN hashing).
 
 Run the unit test suite:
 ```bash
 yarn test
 ```
 
-### 🎭 End-to-End Tests (Playwright)
-E2E flows are located in [src/tests/e2e/bank.spec.ts](file:///root/Thallium/src/tests/e2e/bank.spec.ts) and run Chromium browsers to assert core navigation, authentication templates, and signup views.
+### End-to-End Tests (Playwright)
+E2E flows are located in `src/tests/e2e/bank.spec.ts` and run Chromium browsers to assert core navigation, authentication templates, and signup views.
 
 Run Playwright tests locally:
 ```bash
@@ -198,20 +196,20 @@ yarn playwright test --ui
 
 ---
 
-## 📂 Project Structure
+## Project Structure
 
 ```bash
-├── database/            # Database assets & configurations
-├── docs/                # Design & architecture documentation
+├── database/            # Database assets and configurations
+├── docs/                # Design and architecture documentation
 │   ├── DESIGN.md        # UX/UI system guidelines
 │   └── AGENTS.md        # Next.js workspace specifications
-├── public/              # Static files & assets
+├── public/              # Static files and assets
 ├── src/
 │   ├── app/             # Next.js 16 App Router pages
 │   ├── components/      # UI component library (Button, Modal, Input, etc.)
 │   ├── features/        # Complex dashboard sub-views (Ledger, Loans, Cards)
-│   ├── hooks/           # custom React Hooks (useAuth)
-│   ├── lib/             # Utilities (utils.ts) & Supabase client config
+│   ├── hooks/           # Custom React Hooks (useAuth)
+│   ├── lib/             # Utilities (utils.ts) and Supabase client config
 │   └── tests/           # Vitest and Playwright test files
 ├── supabase/            # Local Supabase configurations
 │   ├── migrations/      # DB SQL schema migrations
