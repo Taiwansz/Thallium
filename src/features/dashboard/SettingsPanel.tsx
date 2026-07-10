@@ -91,17 +91,17 @@ export function SettingsPanel() {
   return (
     <div className="space-y-6 max-w-5xl">
       <div>
-        <h2 className="text-xl font-bold tracking-tight text-zinc-100 font-sans">Configurações Contábeis</h2>
-        <p className="text-xs text-zinc-400 font-sans mt-0.5">
+        <h2 className="text-xl font-bold tracking-wide text-warm-white font-display">Configurações Contábeis</h2>
+        <p className="text-xs text-silver-metallic/70 font-sans mt-1">
           Gerencie seu perfil de titular e configure suas chaves de segurança transacional.
         </p>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* Profile Details Card */}
-        <Card>
+        <Card className="border border-white/[0.06] p-2">
           <CardHeader>
-            <CardTitle className="text-sm font-semibold uppercase tracking-wider text-zinc-400">Dados do Titular</CardTitle>
+            <CardTitle className="text-sm font-semibold uppercase tracking-wider text-silver-metallic">Dados do Titular</CardTitle>
             <CardDescription>Atualize seu nome de exibição no razão bancário.</CardDescription>
           </CardHeader>
           <CardContent>
@@ -114,7 +114,7 @@ export function SettingsPanel() {
                 {...regProfile('nome')}
               />
 
-              <div className="text-xs text-zinc-500 font-mono space-y-1 bg-zinc-950/40 p-3 rounded border border-zinc-850">
+              <div className="text-xs text-silver-metallic/70 font-mono space-y-1.5 bg-[#090909] p-4 rounded-xl border border-white/[0.06] leading-relaxed">
                 <div>E-MAIL: {profile?.email}</div>
                 <div>CPF: {profile?.cpf}</div>
               </div>
@@ -128,19 +128,19 @@ export function SettingsPanel() {
         </Card>
 
         {/* Security Transaction PIN Card */}
-        <Card>
+        <Card className="border border-white/[0.06] p-2">
           <CardHeader>
-            <CardTitle className="text-sm font-semibold uppercase tracking-wider text-zinc-400">Senha de Transação (PIN)</CardTitle>
+            <CardTitle className="text-sm font-semibold uppercase tracking-wider text-silver-metallic">Senha de Transação (PIN)</CardTitle>
             <CardDescription>PIN de 4 dígitos exigido para efetuar Pix e transferências.</CardDescription>
           </CardHeader>
           <CardContent>
             <form onSubmit={handlePinSubmit(onPinSubmit)} className="space-y-4">
-              <div className="text-xs text-zinc-400 mb-2">
+              <div className="text-xs text-silver-metallic/70 mb-2 leading-relaxed">
                 Status atual:{' '}
                 {profile?.senha_transacao ? (
-                  <span className="text-primary font-bold">CONFIGURADA (ATIVADA)</span>
+                  <span className="text-gold-champagne font-bold font-display">CONFIGURADA (ATIVADA)</span>
                 ) : (
-                  <span className="text-rose-500 font-bold">PENDENTE DE CONFIGURAÇÃO (DESATIVADA)</span>
+                  <span className="text-rose-500 font-bold font-display">PENDENTE DE CONFIGURAÇÃO (DESATIVADA)</span>
                 )}
               </div>
 

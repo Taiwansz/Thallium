@@ -13,13 +13,13 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
         ref={ref}
         disabled={disabled || isLoading}
         className={cn(
-          "relative inline-flex items-center justify-center rounded-[0.375rem] text-sm font-medium tracking-normal transition-all duration-75 focus:outline-none focus:ring-1 focus:ring-primary disabled:opacity-50 disabled:pointer-events-none active:translate-y-[-1px] cursor-pointer selection:bg-transparent",
+          "relative inline-flex items-center justify-center rounded-xl text-sm font-medium tracking-wide transition-all duration-200 focus:outline-none focus:ring-1 focus:ring-gold-champagne/40 disabled:opacity-50 disabled:pointer-events-none active:scale-[0.98] cursor-pointer selection:bg-transparent font-display",
           {
-            "bg-primary text-[#09090b] hover:bg-[#10b981]/90 font-semibold": variant === 'primary',
-            "border border-zinc-800 bg-transparent text-zinc-50 hover:bg-zinc-900/60": variant === 'secondary',
-            "bg-destructive text-zinc-50 hover:bg-destructive/90": variant === 'destructive',
-            "bg-transparent text-zinc-400 hover:text-zinc-50 hover:bg-zinc-900/40": variant === 'ghost',
-            "py-2.5 px-4": true
+            "bg-gold-champagne text-black-pure hover:bg-gold-deep hover:shadow-[0_0_20px_rgba(212,175,106,0.25)] font-bold": variant === 'primary',
+            "border border-white/[0.08] bg-transparent text-silver-metallic hover:bg-[#1A1A1A] hover:text-warm-white": variant === 'secondary',
+            "bg-rose-600 text-zinc-50 hover:bg-rose-700 hover:shadow-[0_0_20px_rgba(225,29,72,0.25)] font-semibold": variant === 'destructive',
+            "bg-transparent text-silver-metallic hover:text-warm-white hover:bg-white/[0.04]": variant === 'ghost',
+            "py-2.5 px-4.5": true
           },
           className
         )}
@@ -41,3 +41,4 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
   }
 );
 Button.displayName = 'Button';
+

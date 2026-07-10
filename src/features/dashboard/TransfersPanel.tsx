@@ -240,29 +240,29 @@ export function TransfersPanel() {
   return (
     <div className="space-y-6 max-w-5xl">
       <div>
-        <h2 className="text-xl font-bold tracking-tight text-zinc-100 font-sans">Transferências Financeiras</h2>
-        <p className="text-xs text-zinc-400 font-sans mt-0.5">
+        <h2 className="text-xl font-bold tracking-wide text-warm-white font-display">Transferências Financeiras</h2>
+        <p className="text-xs text-silver-metallic/70 font-sans mt-1">
           Efetue transferências instantâneas Pix, TEDs e gerencie suas chaves digitais.
         </p>
       </div>
 
       {/* Internal Tabs */}
-      <div className="flex border-b border-zinc-800 space-x-6">
+      <div className="flex border-b border-white/[0.06] space-x-6">
         <button
           onClick={() => setActiveTab('email')}
-          className={`py-3 text-sm font-semibold border-b-2 cursor-pointer transition-colors ${activeTab === 'email' ? 'border-primary text-primary' : 'border-transparent text-zinc-400 hover:text-zinc-50'}`}
+          className={`py-3 text-sm font-bold border-b-2 cursor-pointer transition-colors font-display ${activeTab === 'email' ? 'border-gold-champagne text-gold-champagne' : 'border-transparent text-silver-metallic hover:text-warm-white'}`}
         >
           Transferência por E-mail
         </button>
         <button
           onClick={() => setActiveTab('pix')}
-          className={`py-3 text-sm font-semibold border-b-2 cursor-pointer transition-colors ${activeTab === 'pix' ? 'border-primary text-primary' : 'border-transparent text-zinc-400 hover:text-zinc-50'}`}
+          className={`py-3 text-sm font-bold border-b-2 cursor-pointer transition-colors font-display ${activeTab === 'pix' ? 'border-gold-champagne text-gold-champagne' : 'border-transparent text-silver-metallic hover:text-warm-white'}`}
         >
           Área Pix
         </button>
         <button
           onClick={() => setActiveTab('keys')}
-          className={`py-3 text-sm font-semibold border-b-2 cursor-pointer transition-colors ${activeTab === 'keys' ? 'border-primary text-primary' : 'border-transparent text-zinc-400 hover:text-zinc-50'}`}
+          className={`py-3 text-sm font-bold border-b-2 cursor-pointer transition-colors font-display ${activeTab === 'keys' ? 'border-gold-champagne text-gold-champagne' : 'border-transparent text-silver-metallic hover:text-warm-white'}`}
         >
           Minhas Chaves Pix
         </button>
@@ -270,9 +270,9 @@ export function TransfersPanel() {
 
       {/* Tab Contents */}
       {activeTab === 'email' && (
-        <Card className="max-w-md">
+        <Card className="max-w-md border border-white/[0.06] p-2">
           <CardHeader>
-            <CardTitle className="text-sm font-semibold uppercase tracking-wider text-zinc-400">Enviar Dinheiro por E-mail</CardTitle>
+            <CardTitle className="text-sm font-semibold uppercase tracking-wider text-silver-metallic">Enviar Dinheiro por E-mail</CardTitle>
             <CardDescription>Envie recursos diretamente informando o e-mail cadastrado do destinatário.</CardDescription>
           </CardHeader>
           <CardContent>
@@ -323,9 +323,9 @@ export function TransfersPanel() {
       )}
 
       {activeTab === 'pix' && (
-        <Card className="max-w-md">
+        <Card className="max-w-md border border-white/[0.06] p-2">
           <CardHeader>
-            <CardTitle className="text-sm font-semibold uppercase tracking-wider text-zinc-400">Enviar Pix Instantâneo</CardTitle>
+            <CardTitle className="text-sm font-semibold uppercase tracking-wider text-silver-metallic">Enviar Pix Instantâneo</CardTitle>
             <CardDescription>Informe qualquer chave Pix registrada no sistema (CPF, E-mail ou chave aleatória).</CardDescription>
           </CardHeader>
           <CardContent>
@@ -371,22 +371,22 @@ export function TransfersPanel() {
       {activeTab === 'keys' && (
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {/* Register Key Form */}
-          <Card className="md:col-span-1">
+          <Card className="md:col-span-1 border border-white/[0.06] p-2">
             <CardHeader>
-              <CardTitle className="text-sm font-semibold uppercase tracking-wider text-zinc-400">Registrar Chave Pix</CardTitle>
+              <CardTitle className="text-sm font-semibold uppercase tracking-wider text-silver-metallic">Registrar Chave Pix</CardTitle>
               <CardDescription>Cadastre chaves para receber Pix de outros clientes.</CardDescription>
             </CardHeader>
             <CardContent>
               <form onSubmit={handleCreatePixKey} className="space-y-4">
                 <div className="flex flex-col space-y-1.5 w-full">
-                  <label className="text-xs font-semibold uppercase tracking-wider text-zinc-400">Tipo de Chave</label>
+                  <label className="text-xs font-semibold uppercase tracking-wider text-silver-metallic font-display select-none">Tipo de Chave</label>
                   <select
                     value={newKeyType}
                     onChange={(e) => {
                       setNewKeyType(e.target.value as any);
                       setCustomKey('');
                     }}
-                    className="flex w-full rounded-[0.375rem] border border-zinc-800 bg-[#09090b] px-3.5 py-2.5 text-sm text-zinc-50 focus:outline-none focus:border-primary"
+                    className="flex w-full rounded-xl border border-white/[0.08] bg-[#090909] px-4 py-3 text-sm text-warm-white focus:outline-none focus:border-gold-champagne focus:ring-1 focus:ring-gold-champagne/30 transition-all duration-200"
                   >
                     <option value="aleatoria">Aleatória (Gerada automaticamente)</option>
                     <option value="cpf">CPF (Vinculado ao perfil)</option>
@@ -395,14 +395,14 @@ export function TransfersPanel() {
                 </div>
 
                 {newKeyType === 'cpf' && (
-                  <div className="text-xs text-zinc-400 bg-zinc-950/60 p-3 rounded border border-zinc-850">
-                    A chave criada utilizará seu CPF cadastrado: <strong className="text-zinc-200">{profile?.cpf}</strong>.
+                  <div className="text-xs text-silver-metallic/70 bg-[#090909]/60 p-4 rounded-xl border border-white/[0.06] leading-relaxed">
+                    A chave criada utilizará seu CPF cadastrado: <strong className="text-warm-white font-bold font-mono">{profile?.cpf}</strong>.
                   </div>
                 )}
 
                 {newKeyType === 'email' && (
-                  <div className="text-xs text-zinc-400 bg-zinc-950/60 p-3 rounded border border-zinc-850">
-                    A chave criada utilizará seu e-mail cadastrado: <strong className="text-zinc-200">{profile?.email}</strong>.
+                  <div className="text-xs text-silver-metallic/70 bg-[#090909]/60 p-4 rounded-xl border border-white/[0.06] leading-relaxed">
+                    A chave criada utilizará seu e-mail cadastrado: <strong className="text-warm-white font-bold">{profile?.email}</strong>.
                   </div>
                 )}
 
@@ -415,30 +415,30 @@ export function TransfersPanel() {
           </Card>
 
           {/* Keys list */}
-          <Card className="md:col-span-2">
+          <Card className="md:col-span-2 border border-white/[0.06] p-2">
             <CardHeader>
-              <CardTitle className="text-sm font-semibold uppercase tracking-wider text-zinc-400">Suas Chaves Registradas</CardTitle>
+              <CardTitle className="text-sm font-semibold uppercase tracking-wider text-silver-metallic">Suas Chaves Registradas</CardTitle>
               <CardDescription>Chaves vinculadas à sua conta digital.</CardDescription>
             </CardHeader>
             <CardContent className="p-0">
-              <div className="divide-y divide-zinc-800">
+              <div className="divide-y divide-white/[0.04]">
                 {loadingKeys ? (
-                  <div className="p-6 text-center text-sm text-zinc-400 animate-pulse">Carregando chaves...</div>
+                  <div className="p-6 text-center text-sm text-silver-metallic animate-pulse">Carregando chaves...</div>
                 ) : !pixKeys || pixKeys.length === 0 ? (
-                  <div className="p-6 text-center text-sm text-zinc-500 font-sans">Nenhuma chave Pix cadastrada para esta conta.</div>
+                  <div className="p-6 text-center text-sm text-silver-metallic/50 font-sans">Nenhuma chave Pix cadastrada para esta conta.</div>
                 ) : (
                   pixKeys.map((key) => (
-                    <div key={key.id} className="p-4 flex items-center justify-between">
+                    <div key={key.id} className="p-4.5 flex items-center justify-between hover:bg-white/[0.02] transition-colors">
                       <div className="flex items-center space-x-3">
-                        <Key className="w-4 h-4 text-primary" />
+                        <Key className="w-4 h-4 text-gold-champagne" />
                         <div>
-                          <div className="text-xs font-semibold uppercase tracking-wider text-zinc-400">{key.tipo}</div>
-                          <div className="text-sm font-mono text-zinc-200 break-all select-all">{key.chave}</div>
+                          <div className="text-[10px] font-bold uppercase tracking-wider text-silver-metallic/50 font-display">{key.tipo}</div>
+                          <div className="text-sm font-mono text-warm-white break-all select-all mt-0.5">{key.chave}</div>
                         </div>
                       </div>
                       <button
                         onClick={() => handleDeletePixKey(key.id)}
-                        className="text-zinc-500 hover:text-rose-600 transition-colors p-1.5 rounded hover:bg-zinc-850 cursor-pointer"
+                        className="text-silver-metallic/40 hover:text-rose-500 transition-colors p-2 rounded-xl hover:bg-white/[0.05] cursor-pointer"
                       >
                         <Trash2 className="w-4 h-4" />
                       </button>
@@ -453,3 +453,4 @@ export function TransfersPanel() {
     </div>
   );
 }
+

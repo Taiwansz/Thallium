@@ -13,7 +13,6 @@ import {
   Landmark, 
   Settings, 
   LogOut,
-  Menu,
   X,
   MoreHorizontal
 } from 'lucide-react';
@@ -42,12 +41,12 @@ export default function DashboardPage() {
 
   if (loading || !user) {
     return (
-      <div className="flex min-h-screen bg-[#09090b] items-center justify-center select-none">
+      <div className="flex min-h-screen bg-[#090909] items-center justify-center select-none font-sans">
         <div className="flex flex-col items-center space-y-4">
-          <div className="w-12 h-12 rounded bg-primary flex items-center justify-center font-mono font-bold text-[#09090b] text-xl animate-pulse">
+          <div className="w-12 h-12 rounded-2xl bg-gold-champagne flex items-center justify-center font-display font-bold text-[#090909] text-xl animate-pulse shadow-[0_0_20px_rgba(212,175,106,0.3)]">
             Tl
           </div>
-          <span className="text-xs font-mono tracking-widest text-zinc-500 uppercase">Sincronizando Ledger...</span>
+          <span className="text-xs font-display tracking-widest text-silver-metallic uppercase">Sincronizando Ledger...</span>
         </div>
       </div>
     );
@@ -65,23 +64,23 @@ export default function DashboardPage() {
   ] as const;
 
   return (
-    <div className="flex min-h-screen bg-[#09090b] text-[#fafafa] font-sans selection:bg-primary selection:text-[#09090b] relative">
+    <div className="flex min-h-screen bg-[#090909] text-warm-white font-sans selection:bg-gold-champagne selection:text-[#090909] relative">
       
       {/* Mobile Top Navbar (app-style) */}
-      <header className="md:hidden w-full h-16 border-b border-zinc-800 bg-[#09090b]/90 backdrop-blur-md flex items-center justify-between px-6 fixed top-0 left-0 z-30">
+      <header className="md:hidden w-full h-16 border-b border-white/[0.06] bg-[#090909]/90 backdrop-blur-md flex items-center justify-between px-6 fixed top-0 left-0 z-30">
         <div className="flex items-center space-x-2">
-          <div className="w-7 h-7 rounded bg-primary flex items-center justify-center font-mono font-bold text-[#09090b] text-sm">
+          <div className="w-7 h-7 rounded-lg bg-gold-champagne flex items-center justify-center font-display font-bold text-[#090909] text-sm">
             Tl
           </div>
-          <span className="text-sm font-bold tracking-wider text-zinc-100 uppercase">Thallium</span>
+          <span className="text-sm font-bold tracking-wider text-warm-white font-display uppercase">Thallium</span>
         </div>
         <div className="flex items-center space-x-3">
-          <div className="w-7 h-7 rounded-full bg-zinc-900 border border-zinc-800 flex items-center justify-center text-[10px] font-bold text-zinc-300 uppercase">
+          <div className="w-7 h-7 rounded-full bg-[#121212] border border-white/[0.08] flex items-center justify-center text-[10px] font-bold text-silver-metallic uppercase font-display">
             {profile?.nome ? profile.nome.charAt(0) : 'U'}
           </div>
           <button 
             onClick={() => signOut().then(() => router.replace('/login'))}
-            className="text-rose-500 hover:text-rose-400 p-1.5 rounded-full hover:bg-rose-950/20 transition-colors"
+            className="text-rose-500 hover:text-rose-400 p-1.5 rounded-xl hover:bg-rose-950/20 transition-colors"
             title="Sair"
           >
             <LogOut className="w-4 h-4" />
@@ -91,19 +90,19 @@ export default function DashboardPage() {
 
       {/* Desktop Sidebar (hidden on mobile) */}
       <aside 
-        className="hidden md:flex fixed md:sticky top-0 left-0 h-screen w-64 border-r border-zinc-800 bg-zinc-950 flex-col justify-between p-6 z-40"
+        className="hidden md:flex fixed md:sticky top-0 left-0 h-screen w-64 border-r border-white/[0.06] bg-[#090909] flex-col justify-between p-6 z-40"
       >
         <div className="space-y-8">
           {/* Logo brand */}
           <div className="flex items-center space-x-3 select-none">
-            <div className="w-8 h-8 rounded bg-primary flex items-center justify-center font-mono font-bold text-[#09090b] text-base">
+            <div className="w-8 h-8 rounded-xl bg-gold-champagne flex items-center justify-center font-display font-bold text-[#090909] text-base shadow-[0_0_10px_rgba(212,175,106,0.2)]">
               Tl
             </div>
-            <span className="font-bold tracking-tight text-lg text-zinc-100">THALLIUM</span>
+            <span className="font-bold tracking-wider text-lg text-warm-white font-display">THALLIUM</span>
           </div>
 
           {/* Menus */}
-          <nav className="flex flex-col space-y-1">
+          <nav className="flex flex-col space-y-1.5">
             {menuItems.map((item) => {
               const Icon = item.icon;
               const isActive = activeView === item.id;
@@ -111,7 +110,7 @@ export default function DashboardPage() {
                 <button
                   key={item.id}
                   onClick={() => setActiveView(item.id)}
-                  className={`flex items-center space-x-3.5 px-3 py-2.5 rounded-[0.375rem] text-sm font-semibold tracking-normal transition-all duration-75 cursor-pointer select-none text-left w-full ${isActive ? 'bg-primary text-[#09090b] hover:bg-[#10b981]/90' : 'text-zinc-400 hover:text-zinc-50 hover:bg-zinc-900/60'}`}
+                  className={`flex items-center space-x-3.5 px-3.5 py-2.5 rounded-xl text-sm font-semibold tracking-wide transition-all duration-200 cursor-pointer select-none text-left w-full font-display ${isActive ? 'bg-gold-champagne text-black-pure font-bold hover:bg-gold-champagne/90 shadow-[0_4px_12px_rgba(212,175,106,0.15)]' : 'text-silver-metallic hover:text-gold-champagne hover:bg-white/[0.04]'}`}
                 >
                   <Icon className="w-4 h-4 shrink-0" />
                   <span>{item.label}</span>
@@ -122,14 +121,14 @@ export default function DashboardPage() {
         </div>
 
         {/* Bottom profile / logout */}
-        <div className="border-t border-zinc-800/60 pt-4 flex flex-col space-y-4">
+        <div className="border-t border-white/[0.06] pt-4 flex flex-col space-y-4">
           <div className="flex items-center space-x-3 select-none">
-            <div className="w-8 h-8 rounded-full bg-zinc-900 border border-zinc-800 flex items-center justify-center font-bold text-xs uppercase text-zinc-300">
+            <div className="w-8 h-8 rounded-full bg-[#121212] border border-white/[0.08] flex items-center justify-center font-bold text-xs uppercase text-gold-champagne font-display">
               {profile?.nome ? profile.nome.charAt(0) : 'U'}
             </div>
             <div className="truncate max-w-[150px]">
-              <div className="text-xs font-semibold text-zinc-200 truncate">{profile?.nome || 'Usuário'}</div>
-              <div className="text-[10px] text-zinc-500 font-mono">CONTA: {profile?.cpf.slice(0, 3)}•••</div>
+              <div className="text-xs font-bold text-warm-white truncate font-display">{profile?.nome || 'Usuário'}</div>
+              <div className="text-[10px] text-silver-metallic/60 font-mono">CONTA: {profile?.cpf.slice(0, 3)}•••</div>
             </div>
           </div>
 
@@ -137,7 +136,7 @@ export default function DashboardPage() {
             onClick={() => {
               signOut().then(() => router.replace('/login'));
             }}
-            className="flex items-center space-x-3.5 px-3 py-2.5 rounded-[0.375rem] text-sm font-semibold text-rose-500 hover:text-rose-400 hover:bg-rose-950/20 transition-all duration-75 cursor-pointer w-full text-left"
+            className="flex items-center space-x-3.5 px-3.5 py-2.5 rounded-xl text-sm font-semibold text-rose-500 hover:text-rose-400 hover:bg-rose-950/20 transition-all duration-150 cursor-pointer w-full text-left font-display"
           >
             <LogOut className="w-4 h-4 shrink-0" />
             <span>Sair do Painel</span>
@@ -146,45 +145,45 @@ export default function DashboardPage() {
       </aside>
 
       {/* Mobile Bottom Tab Bar (app-style, fixed at the bottom) */}
-      <nav className="md:hidden fixed bottom-0 left-0 right-0 h-16 bg-zinc-950/90 border-t border-zinc-800 backdrop-blur-md flex items-center justify-around z-30 px-2 pb-safe">
+      <nav className="md:hidden fixed bottom-0 left-0 right-0 h-16 bg-[#090909]/95 border-t border-white/[0.06] backdrop-blur-md flex items-center justify-around z-30 px-2 pb-safe">
         <button
           onClick={() => { setActiveView('home'); setShowMobileMenu(false); }}
-          className={`flex flex-col items-center justify-center w-12 h-12 transition-colors ${activeView === 'home' ? 'text-primary' : 'text-zinc-500 hover:text-zinc-300'}`}
+          className={`flex flex-col items-center justify-center w-12 h-12 transition-colors duration-200 ${activeView === 'home' ? 'text-gold-champagne' : 'text-silver-metallic hover:text-warm-white'}`}
         >
           <Wallet className="w-5 h-5" />
-          <span className="text-[9px] font-medium mt-1">Início</span>
+          <span className="text-[9px] font-medium mt-1 font-display">Início</span>
         </button>
 
         <button
           onClick={() => { setActiveView('extrato'); setShowMobileMenu(false); }}
-          className={`flex flex-col items-center justify-center w-12 h-12 transition-colors ${activeView === 'extrato' ? 'text-primary' : 'text-zinc-500 hover:text-zinc-300'}`}
+          className={`flex flex-col items-center justify-center w-12 h-12 transition-colors duration-200 ${activeView === 'extrato' ? 'text-gold-champagne' : 'text-silver-metallic hover:text-warm-white'}`}
         >
           <History className="w-5 h-5" />
-          <span className="text-[9px] font-medium mt-1">Extrato</span>
+          <span className="text-[9px] font-medium mt-1 font-display">Extrato</span>
         </button>
 
         <button
           onClick={() => { setActiveView('transferencias'); setShowMobileMenu(false); }}
-          className={`flex flex-col items-center justify-center w-12 h-12 transition-colors ${activeView === 'transferencias' ? 'text-primary' : 'text-zinc-500 hover:text-zinc-300'}`}
+          className={`flex flex-col items-center justify-center w-12 h-12 transition-colors duration-200 ${activeView === 'transferencias' ? 'text-gold-champagne' : 'text-silver-metallic hover:text-warm-white'}`}
         >
           <Send className="w-5 h-5" />
-          <span className="text-[9px] font-medium mt-1">Transferir</span>
+          <span className="text-[9px] font-medium mt-1 font-display">Transferir</span>
         </button>
 
         <button
           onClick={() => { setActiveView('cartoes'); setShowMobileMenu(false); }}
-          className={`flex flex-col items-center justify-center w-12 h-12 transition-colors ${activeView === 'cartoes' ? 'text-primary' : 'text-zinc-500 hover:text-zinc-300'}`}
+          className={`flex flex-col items-center justify-center w-12 h-12 transition-colors duration-200 ${activeView === 'cartoes' ? 'text-gold-champagne' : 'text-silver-metallic hover:text-warm-white'}`}
         >
           <CreditCard className="w-5 h-5" />
-          <span className="text-[9px] font-medium mt-1">Cartões</span>
+          <span className="text-[9px] font-medium mt-1 font-display">Cartões</span>
         </button>
 
         <button
           onClick={() => setShowMobileMenu(!showMobileMenu)}
-          className={`flex flex-col items-center justify-center w-12 h-12 transition-colors ${showMobileMenu || ['investimentos', 'emprestimos', 'config'].includes(activeView) ? 'text-primary' : 'text-zinc-500 hover:text-zinc-300'}`}
+          className={`flex flex-col items-center justify-center w-12 h-12 transition-colors duration-200 ${showMobileMenu || ['investimentos', 'emprestimos', 'config'].includes(activeView) ? 'text-gold-champagne' : 'text-silver-metallic hover:text-warm-white'}`}
         >
           <MoreHorizontal className="w-5 h-5" />
-          <span className="text-[9px] font-medium mt-1">Mais</span>
+          <span className="text-[9px] font-medium mt-1 font-display">Mais</span>
         </button>
       </nav>
 
@@ -206,11 +205,11 @@ export default function DashboardPage() {
               animate={{ y: 0 }}
               exit={{ y: '100%' }}
               transition={{ type: 'spring', damping: 25, stiffness: 250 }}
-              className="md:hidden fixed bottom-16 left-0 right-0 bg-zinc-950 border-t border-zinc-800 rounded-t-2xl p-6 pb-8 z-50 space-y-6"
+              className="md:hidden fixed bottom-16 left-0 right-0 bg-[#090909] border-t border-white/[0.06] rounded-t-2xl p-6 pb-8 z-50 space-y-6"
             >
-              <div className="flex items-center justify-between border-b border-zinc-900/50 pb-3">
-                <span className="text-xs font-semibold uppercase tracking-wider text-zinc-400">Serviços Adicionais</span>
-                <button onClick={() => setShowMobileMenu(false)} className="text-zinc-500 hover:text-zinc-300">
+              <div className="flex items-center justify-between border-b border-white/[0.04] pb-3">
+                <span className="text-xs font-bold uppercase tracking-wider text-silver-metallic font-display">Serviços Adicionais</span>
+                <button onClick={() => setShowMobileMenu(false)} className="text-silver-metallic hover:text-warm-white">
                   <X className="w-4 h-4" />
                 </button>
               </div>
@@ -218,37 +217,37 @@ export default function DashboardPage() {
               <div className="grid grid-cols-3 gap-4">
                 <button
                   onClick={() => { setActiveView('investimentos'); setShowMobileMenu(false); }}
-                  className={`flex flex-col items-center justify-center p-4 rounded-xl border transition-colors ${activeView === 'investimentos' ? 'bg-primary/10 border-primary/20 text-primary' : 'bg-zinc-900/50 border-zinc-800 text-zinc-400 hover:text-zinc-200'}`}
+                  className={`flex flex-col items-center justify-center p-4 rounded-2xl border transition-all duration-200 ${activeView === 'investimentos' ? 'bg-gold-champagne/10 border-gold-champagne/20 text-gold-champagne' : 'bg-[#121212]/50 border-white/[0.06] text-silver-metallic hover:text-warm-white'}`}
                 >
                   <TrendingUp className="w-5 h-5 mb-2" />
-                  <span className="text-xs font-semibold">Investir</span>
+                  <span className="text-xs font-bold font-display">Investir</span>
                 </button>
 
                 <button
                   onClick={() => { setActiveView('emprestimos'); setShowMobileMenu(false); }}
-                  className={`flex flex-col items-center justify-center p-4 rounded-xl border transition-colors ${activeView === 'emprestimos' ? 'bg-primary/10 border-primary/20 text-primary' : 'bg-zinc-900/50 border-zinc-800 text-zinc-400 hover:text-zinc-200'}`}
+                  className={`flex flex-col items-center justify-center p-4 rounded-2xl border transition-all duration-200 ${activeView === 'emprestimos' ? 'bg-gold-champagne/10 border-gold-champagne/20 text-gold-champagne' : 'bg-[#121212]/50 border-white/[0.06] text-silver-metallic hover:text-warm-white'}`}
                 >
                   <Landmark className="w-5 h-5 mb-2" />
-                  <span className="text-xs font-semibold">Empréstimos</span>
+                  <span className="text-xs font-bold font-display">Empréstimos</span>
                 </button>
 
                 <button
                   onClick={() => { setActiveView('config'); setShowMobileMenu(false); }}
-                  className={`flex flex-col items-center justify-center p-4 rounded-xl border transition-colors ${activeView === 'config' ? 'bg-primary/10 border-primary/20 text-primary' : 'bg-zinc-900/50 border-zinc-800 text-zinc-400 hover:text-zinc-200'}`}
+                  className={`flex flex-col items-center justify-center p-4 rounded-2xl border transition-all duration-200 ${activeView === 'config' ? 'bg-gold-champagne/10 border-gold-champagne/20 text-gold-champagne' : 'bg-[#121212]/50 border-white/[0.06] text-silver-metallic hover:text-warm-white'}`}
                 >
                   <Settings className="w-5 h-5 mb-2" />
-                  <span className="text-xs font-semibold">Ajustes</span>
+                  <span className="text-xs font-bold font-display">Ajustes</span>
                 </button>
               </div>
 
-              <div className="border-t border-zinc-900/50 pt-4 flex flex-col space-y-4">
+              <div className="border-t border-white/[0.04] pt-4 flex flex-col space-y-4">
                 <div className="flex items-center space-x-3 select-none px-2">
-                  <div className="w-8 h-8 rounded-full bg-zinc-900 border border-zinc-800 flex items-center justify-center font-bold text-xs uppercase text-zinc-300">
+                  <div className="w-8 h-8 rounded-full bg-[#121212] border border-white/[0.08] flex items-center justify-center font-bold text-xs uppercase text-gold-champagne font-display">
                     {profile?.nome ? profile.nome.charAt(0) : 'U'}
                   </div>
                   <div>
-                    <div className="text-xs font-semibold text-zinc-200">{profile?.nome || 'Usuário'}</div>
-                    <div className="text-[10px] text-zinc-500 font-mono">CONTA: {profile?.cpf.slice(0, 3)}•••</div>
+                    <div className="text-xs font-bold text-warm-white font-display">{profile?.nome || 'Usuário'}</div>
+                    <div className="text-[10px] text-silver-metallic/60 font-mono">CONTA: {profile?.cpf.slice(0, 3)}•••</div>
                   </div>
                 </div>
 
@@ -257,7 +256,7 @@ export default function DashboardPage() {
                     setShowMobileMenu(false);
                     signOut().then(() => router.replace('/login'));
                   }}
-                  className="flex items-center justify-center space-x-2 w-full py-3 rounded-xl bg-rose-950/20 border border-rose-900/25 text-sm font-semibold text-rose-500 hover:bg-rose-950/30 transition-colors"
+                  className="flex items-center justify-center space-x-2 w-full py-3.5 rounded-xl bg-rose-950/20 border border-rose-900/25 text-sm font-semibold text-rose-500 hover:bg-rose-950/30 transition-colors font-display"
                 >
                   <LogOut className="w-4 h-4 shrink-0" />
                   <span>Sair da Conta Corrente</span>
@@ -296,3 +295,4 @@ export default function DashboardPage() {
     </div>
   );
 }
+

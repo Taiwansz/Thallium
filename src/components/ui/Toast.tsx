@@ -56,21 +56,22 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
               }}
               exit={{ opacity: 0, scale: 0.9, transition: { duration: 0.15 } }}
               className={cn(
-                "flex items-start justify-between p-4 rounded-md border text-sm pointer-events-auto bg-zinc-900 border-zinc-800 text-zinc-50 shadow-none"
+                "flex items-start justify-between p-4 rounded-xl border border-white/[0.08] text-sm pointer-events-auto bg-[#121212]/95 backdrop-blur-md text-warm-white shadow-2xl shadow-black/60"
               )}
             >
               <div className="flex items-start space-x-3">
-                {t.type === 'success' && <CheckCircle2 className="h-5 w-5 text-primary shrink-0" />}
-                {t.type === 'error' && <AlertCircle className="h-5 w-5 text-rose-600 shrink-0" />}
-                {t.type === 'info' && <Info className="h-5 w-5 text-zinc-400 shrink-0" />}
-                <p className="font-medium text-zinc-100">{t.message}</p>
+                {t.type === 'success' && <CheckCircle2 className="h-5 w-5 text-gold-champagne shrink-0" />}
+                {t.type === 'error' && <AlertCircle className="h-5 w-5 text-rose-500 shrink-0" />}
+                {t.type === 'info' && <Info className="h-5 w-5 text-silver-metallic shrink-0" />}
+                <p className="font-medium text-warm-white">{t.message}</p>
               </div>
               <button
                 onClick={() => removeToast(t.id)}
-                className="ml-4 rounded-sm text-zinc-400 hover:text-zinc-50 cursor-pointer p-0.5"
+                className="ml-4 rounded-lg text-silver-metallic hover:text-warm-white cursor-pointer p-0.5 hover:bg-white/[0.05]"
               >
                 <X className="h-4 w-4" />
               </button>
+
             </motion.div>
           ))}
         </AnimatePresence>

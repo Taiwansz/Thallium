@@ -10,7 +10,7 @@ import { Button } from '@/components/ui/Button';
 import { Modal } from '@/components/ui/Modal';
 import { Input } from '@/components/ui/Input';
 import { useToast } from '@/components/ui/Toast';
-import { ArrowUpRight, ArrowDownLeft, Plus, Minus, Smartphone, FileText, Wallet } from 'lucide-react';
+import { ArrowUpRight, ArrowDownLeft, Plus, Minus, Smartphone, FileText } from 'lucide-react';
 
 interface Transaction {
   id_transacao: string;
@@ -126,38 +126,38 @@ export function OverviewPanel() {
       {/* Account Info Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {/* Balance Card */}
-        <Card className="md:col-span-2 flex flex-col justify-between">
+        <Card className="md:col-span-2 flex flex-col justify-between p-2">
           <CardHeader className="pb-2">
-            <CardDescription className="uppercase tracking-wider text-xs font-semibold">
+            <CardDescription>
               Saldo em Conta Corrente
             </CardDescription>
-            <CardTitle className="text-4xl md:text-5xl font-mono tracking-tight font-bold text-primary tabular-nums mt-1">
+            <CardTitle className="text-4xl md:text-5xl font-display tracking-tight font-bold text-gold-champagne tabular-nums mt-2">
               {conta ? formatCurrency(conta.saldo) : 'R$ 0,00'}
             </CardTitle>
           </CardHeader>
           <CardContent className="pt-0">
-            <div className="flex items-center text-xs text-zinc-400 font-mono mt-4">
+            <div className="flex items-center text-xs text-silver-metallic/60 font-mono mt-4">
               <span>CONTA AGÊNCIA: 0001</span>
-              <span className="mx-2">•</span>
+              <span className="mx-2 text-white/10">•</span>
               <span>NÚMERO: {conta?.numero_conta || '------'}</span>
             </div>
           </CardContent>
         </Card>
 
         {/* Profile Card */}
-        <Card className="flex flex-col justify-between">
+        <Card className="flex flex-col justify-between p-2">
           <CardHeader className="pb-2">
-            <CardDescription className="uppercase tracking-wider text-xs font-semibold">
+            <CardDescription>
               Titular do Razão
             </CardDescription>
-            <CardTitle className="text-lg font-bold text-zinc-100 truncate mt-1">
+            <CardTitle className="text-lg font-bold font-display text-warm-white truncate mt-2">
               {profile?.nome || 'Cliente Thallium'}
             </CardTitle>
           </CardHeader>
           <CardContent className="pt-0">
-            <div className="text-xs text-zinc-400 font-mono space-y-1">
+            <div className="text-xs text-silver-metallic/60 font-mono space-y-1 mt-4">
               <div>CPF: {profile ? formatCPF(profile.cpf) : '-----------'}</div>
-              <div>E-MAIL: {profile?.email || '---------'}</div>
+              <div className="truncate">E-MAIL: {profile?.email || '---------'}</div>
             </div>
           </CardContent>
         </Card>
@@ -165,82 +165,78 @@ export function OverviewPanel() {
 
       {/* Quick Actions Panel */}
       <div>
-        <h3 className="text-xs font-semibold uppercase tracking-wider text-zinc-400 mb-4">
+        <h3 className="text-xs font-bold uppercase tracking-wider text-silver-metallic font-display mb-4">
           Ações Rápidas de Caixa
         </h3>
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-          <Button 
-            variant="secondary" 
-            className="flex flex-col items-center justify-center p-6 h-24 rounded-lg cursor-pointer"
+          <button 
+            className="flex flex-col items-center justify-center p-6 h-24 rounded-2xl border border-white/[0.06] bg-[#121212]/50 hover:bg-[#121212] hover:border-gold-champagne/30 text-warm-white transition-all duration-200 active:scale-[0.97] cursor-pointer shadow-lg shadow-black/30 font-display group"
             onClick={() => setModalType('deposit')}
           >
-            <Plus className="w-5 h-5 mb-2 text-primary" />
-            <span className="text-xs font-semibold">Depositar</span>
-          </Button>
+            <Plus className="w-5 h-5 mb-2 text-gold-champagne group-hover:scale-110 transition-transform" />
+            <span className="text-xs font-bold text-silver-metallic group-hover:text-warm-white transition-colors">Depositar</span>
+          </button>
 
-          <Button 
-            variant="secondary" 
-            className="flex flex-col items-center justify-center p-6 h-24 rounded-lg cursor-pointer"
+          <button 
+            className="flex flex-col items-center justify-center p-6 h-24 rounded-2xl border border-white/[0.06] bg-[#121212]/50 hover:bg-[#121212] hover:border-gold-champagne/30 text-warm-white transition-all duration-200 active:scale-[0.97] cursor-pointer shadow-lg shadow-black/30 font-display group"
             onClick={() => setModalType('withdraw')}
           >
-            <Minus className="w-5 h-5 mb-2 text-rose-500" />
-            <span className="text-xs font-semibold">Sacar</span>
-          </Button>
+            <Minus className="w-5 h-5 mb-2 text-rose-500 group-hover:scale-110 transition-transform" />
+            <span className="text-xs font-bold text-silver-metallic group-hover:text-warm-white transition-colors">Sacar</span>
+          </button>
 
-          <Button 
-            variant="secondary" 
-            className="flex flex-col items-center justify-center p-6 h-24 rounded-lg cursor-pointer"
+          <button 
+            className="flex flex-col items-center justify-center p-6 h-24 rounded-2xl border border-white/[0.06] bg-[#121212]/50 hover:bg-[#121212] hover:border-gold-champagne/30 text-warm-white transition-all duration-200 active:scale-[0.97] cursor-pointer shadow-lg shadow-black/30 font-display group"
             onClick={() => setModalType('boleto')}
           >
-            <FileText className="w-5 h-5 mb-2 text-zinc-400" />
-            <span className="text-xs font-semibold">Pagar Boleto</span>
-          </Button>
+            <FileText className="w-5 h-5 mb-2 text-silver-metallic group-hover:scale-110 group-hover:text-gold-champagne transition-all" />
+            <span className="text-xs font-bold text-silver-metallic group-hover:text-warm-white transition-colors">Pagar Boleto</span>
+          </button>
 
-          <Button 
-            variant="secondary" 
-            className="flex flex-col items-center justify-center p-6 h-24 rounded-lg cursor-pointer"
+          <button 
+            className="flex flex-col items-center justify-center p-6 h-24 rounded-2xl border border-white/[0.06] bg-[#121212]/50 hover:bg-[#121212] hover:border-gold-champagne/30 text-warm-white transition-all duration-200 active:scale-[0.97] cursor-pointer shadow-lg shadow-black/30 font-display group"
             onClick={() => setModalType('recharge')}
           >
-            <Smartphone className="w-5 h-5 mb-2 text-zinc-400" />
-            <span className="text-xs font-semibold">Recarga</span>
-          </Button>
+            <Smartphone className="w-5 h-5 mb-2 text-silver-metallic group-hover:scale-110 group-hover:text-gold-champagne transition-all" />
+            <span className="text-xs font-bold text-silver-metallic group-hover:text-warm-white transition-colors">Recarga</span>
+          </button>
         </div>
       </div>
 
       {/* Recent Ledger Transactions */}
       <div>
-        <h3 className="text-xs font-semibold uppercase tracking-wider text-zinc-400 mb-4">
+        <h3 className="text-xs font-bold uppercase tracking-wider text-silver-metallic font-display mb-4">
           Transações Recentes do Razão
         </h3>
-        <Card className="p-0">
-          <div className="divide-y divide-zinc-800">
+        <Card className="p-0 border border-white/[0.06] overflow-hidden">
+          <div className="divide-y divide-white/[0.04]">
             {isLoading ? (
-              <div className="p-6 text-center text-sm text-zinc-400 animate-pulse">
+              <div className="p-6 text-center text-sm text-silver-metallic animate-pulse">
                 Carregando registros...
               </div>
             ) : !recentTransactions || recentTransactions.length === 0 ? (
-              <div className="p-6 text-center text-sm text-zinc-500">
+              <div className="p-6 text-center text-sm text-silver-metallic/55">
                 Nenhuma movimentação registrada neste ledger.
               </div>
             ) : (
               recentTransactions.map((tx) => {
                 const isCredit = tx.valor > 0;
                 return (
-                  <div key={tx.id_transacao} className="p-4 flex items-center justify-between hover:bg-zinc-850 transition-colors">
+                  <div key={tx.id_transacao} className="p-4.5 flex items-center justify-between hover:bg-white/[0.02] transition-colors">
                     <div className="flex items-center space-x-4">
-                      <div className={`w-8 h-8 rounded-full flex items-center justify-center ${isCredit ? 'bg-primary/10 text-primary' : 'bg-rose-500/10 text-rose-500'}`}>
+                      <div className={`w-9 h-9 rounded-full flex items-center justify-center ${isCredit ? 'bg-gold-champagne/10 text-gold-champagne' : 'bg-rose-500/10 text-rose-500'}`}>
                         {isCredit ? <ArrowDownLeft className="w-4 h-4" /> : <ArrowUpRight className="w-4 h-4" />}
                       </div>
                       <div>
-                        <div className="text-sm font-semibold text-zinc-200">{tx.tipo_transacao}</div>
-                        <div className="text-xs text-zinc-400 font-sans">{tx.descricao || 'Sem descrição'}</div>
+                        <div className="text-sm font-bold text-warm-white font-display">{tx.tipo_transacao}</div>
+                        <div className="text-xs text-silver-metallic/70 font-sans mt-0.5">{tx.descricao || 'Sem descrição'}</div>
                       </div>
                     </div>
                     <div className="text-right">
-                      <div className={`text-sm font-mono font-semibold tabular-nums ${isCredit ? 'text-primary' : 'text-zinc-300'}`}>
+                      <div className={`text-sm font-mono font-bold tabular-nums ${isCredit ? 'text-gold-champagne' : 'text-warm-white'}`}>
                         {isCredit ? '+' : ''}{formatCurrency(tx.valor)}
                       </div>
-                      <div className="text-[10px] text-zinc-500 font-mono">
+                      <div className="text-[10px] text-silver-metallic/40 font-mono mt-0.5">
                         {new Date(tx.data_transacao).toLocaleDateString('pt-BR')} {new Date(tx.data_transacao).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}
                       </div>
                     </div>
@@ -308,14 +304,14 @@ export function OverviewPanel() {
           {modalType === 'recharge' && (
             <>
               <div className="flex flex-col space-y-1.5 w-full">
-                <label className="text-xs font-semibold uppercase tracking-wider text-zinc-400">
+                <label className="text-xs font-semibold uppercase tracking-wider text-silver-metallic font-display select-none">
                   Operadora
                 </label>
                 <select
                   value={operator}
                   onChange={(e) => setOperator(e.target.value)}
                   disabled={isSubmitting}
-                  className="flex w-full rounded-[0.375rem] border border-zinc-800 bg-[#09090b] px-3.5 py-2.5 text-sm text-zinc-50 focus:outline-none focus:border-primary"
+                  className="flex w-full rounded-xl border border-white/[0.08] bg-[#090909] px-4 py-3 text-sm text-warm-white focus:outline-none focus:border-gold-champagne focus:ring-1 focus:ring-gold-champagne/30 transition-all duration-200"
                 >
                   <option value="Vivo">Vivo</option>
                   <option value="Claro">Claro</option>
@@ -352,3 +348,4 @@ export function OverviewPanel() {
     </div>
   );
 }
+

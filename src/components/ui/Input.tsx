@@ -14,7 +14,7 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
         {label && (
           <label
             htmlFor={inputId}
-            className="text-xs font-semibold uppercase tracking-wider text-zinc-400 select-none"
+            className="text-xs font-semibold uppercase tracking-wider text-silver-metallic select-none font-display"
           >
             {label}
           </label>
@@ -24,14 +24,14 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
           type={type}
           ref={ref}
           className={cn(
-            "flex w-full rounded-[0.375rem] border border-zinc-800 bg-[#09090b] px-3.5 py-2.5 text-sm text-zinc-50 transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-zinc-500 focus:outline-none focus:border-primary disabled:cursor-not-allowed disabled:opacity-50",
-            error && "border-rose-600 focus:border-rose-600",
+            "flex w-full rounded-xl border border-white/[0.08] bg-[#090909] px-4 py-3 text-sm text-warm-white transition-all duration-200 file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-zinc-600 focus:outline-none focus:border-gold-champagne focus:ring-1 focus:ring-gold-champagne/30 disabled:cursor-not-allowed disabled:opacity-50",
+            error && "border-rose-600 focus:border-rose-600 focus:ring-rose-600/30",
             className
           )}
           {...props}
         />
         {error && (
-          <span className="text-xs text-rose-600 font-medium leading-none mt-1 select-none">
+          <span className="text-xs text-rose-500 font-medium leading-none mt-1 select-none font-display">
             {error}
           </span>
         )}
@@ -40,3 +40,4 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
   }
 );
 Input.displayName = 'Input';
+

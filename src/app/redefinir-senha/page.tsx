@@ -101,74 +101,94 @@ export default function RedefinirSenhaPage() {
   }
 
   return (
-    <div className="flex min-h-screen bg-[#09090b] items-center justify-center p-6 select-none">
+    <div className="flex min-h-screen bg-[#09090b] items-center justify-center p-6 select-none selection:bg-gold-champagne selection:text-black-pure">
       <motion.div
-        initial={{ opacity: 0, y: 15 }}
+        initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0, transition: { type: 'spring', stiffness: 350, damping: 25 } }}
         className="w-full max-w-md"
       >
         <div className="flex flex-col items-center mb-8">
-          <div className="w-10 h-10 rounded bg-primary flex items-center justify-center font-mono font-bold text-[#09090b] text-lg select-none mb-3">
+          <div className="w-11 h-11 rounded-2xl bg-gradient-to-br from-gold-deep via-gold-champagne to-gold-deep flex items-center justify-center font-display font-extrabold text-[#09090b] text-xl shadow-[0_4px_16px_rgba(212,175,106,0.25)] select-none mb-3">
             Tl
           </div>
-          <span className="font-sans font-bold tracking-tight text-xl text-zinc-50 uppercase">REDEFINIR SENHA</span>
+          <span className="font-display font-extrabold tracking-widest text-lg text-transparent bg-clip-text bg-gradient-to-r from-warm-white via-gold-champagne to-warm-white select-none">
+            REDEFINIR SENHA
+          </span>
         </div>
 
-        <Card>
-          <CardHeader>
-            <CardTitle>Nova Senha</CardTitle>
-            <CardDescription>
-              {isValidFlow 
-                ? 'Insira e confirme sua nova senha de acesso.' 
-                : 'O link de redefinição é inválido ou expirou.'}
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            {isValidFlow ? (
-              <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
-                <Input
-                  label="Nova Senha"
-                  type="password"
-                  placeholder="••••••••"
-                  error={errors.password?.message}
-                  disabled={isSubmitting}
-                  {...register('password')}
-                />
-                
-                <Input
-                  label="Confirmar Nova Senha"
-                  type="password"
-                  placeholder="••••••••"
-                  error={errors.confirmPassword?.message}
-                  disabled={isSubmitting}
-                  {...register('confirmPassword')}
-                />
-                
-                <Button type="submit" className="w-full mt-2" isLoading={isSubmitting}>
-                  Atualizar Senha
-                </Button>
-              </form>
-            ) : (
-              <div className="text-center space-y-4">
-                <div className="p-4 bg-zinc-900 border border-zinc-800 rounded-md text-xs text-zinc-400">
-                  Por motivos de segurança, o link para redefinir sua senha é de uso único e possui tempo de expiração curto. Solicite uma nova redefinição.
+        {/* Double-bezel container */}
+        <div className="p-[1.5px] rounded-3xl bg-gradient-to-b from-gold-deep/30 via-black-elevated to-gold-deep/10 shadow-[0_24px_48px_-12px_rgba(0,0,0,0.8)]">
+          <Card className="border border-black-elevated bg-black-card/85 backdrop-blur-md rounded-[22px] overflow-hidden shadow-none">
+            <CardHeader className="pt-8 px-8 pb-4">
+              <CardTitle className="font-display text-2xl font-bold tracking-tight text-transparent bg-clip-text bg-gradient-to-b from-warm-white to-zinc-300">
+                Nova Senha
+              </CardTitle>
+              <CardDescription className="font-sans text-sm text-silver-metallic/70 mt-1.5 leading-relaxed">
+                {isValidFlow 
+                  ? 'Insira e confirme sua nova senha de acesso.' 
+                  : 'O link de redefinição é inválido ou expirou.'}
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="px-8 pb-8">
+              {isValidFlow ? (
+                <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
+                  <Input
+                    label="Nova Senha"
+                    type="password"
+                    placeholder="••••••••"
+                    error={errors.password?.message}
+                    disabled={isSubmitting}
+                    className="rounded-[1.25rem] border-black-elevated bg-[#0c0c0e]/80 text-warm-white focus:border-gold-champagne focus:ring-1 focus:ring-gold-champagne/30 text-sm font-sans placeholder:text-zinc-600 transition-all px-4 py-3"
+                    {...register('password')}
+                  />
+                  
+                  <Input
+                    label="Confirmar Nova Senha"
+                    type="password"
+                    placeholder="••••••••"
+                    error={errors.confirmPassword?.message}
+                    disabled={isSubmitting}
+                    className="rounded-[1.25rem] border-black-elevated bg-[#0c0c0e]/80 text-warm-white focus:border-gold-champagne focus:ring-1 focus:ring-gold-champagne/30 text-sm font-sans placeholder:text-zinc-600 transition-all px-4 py-3"
+                    {...register('confirmPassword')}
+                  />
+                  
+                  <motion.div whileHover={{ scale: 1.01 }} whileTap={{ scale: 0.98 }} className="w-full pt-2">
+                    <Button 
+                      type="submit" 
+                      className="w-full rounded-[1.25rem] bg-gradient-to-r from-gold-deep via-gold-champagne to-gold-deep text-black-pure font-bold hover:brightness-110 shadow-[0_4px_20px_rgba(212,175,106,0.15)] select-none border-none py-3.5" 
+                      isLoading={isSubmitting}
+                    >
+                      Atualizar Senha
+                    </Button>
+                  </motion.div>
+                </form>
+              ) : (
+                <div className="text-center space-y-5 pt-2">
+                  <div className="p-4 bg-black-pure/55 border border-black-elevated rounded-[1.25rem] text-xs text-silver-metallic/80 leading-relaxed font-sans">
+                    Por motivos de segurança, o link para redefinir sua senha é de uso único e possui tempo de expiração curto. Solicite uma nova redefinição.
+                  </div>
+                  <Link href="/recuperar-senha" className="w-full inline-block">
+                    <motion.div whileHover={{ scale: 1.01 }} whileTap={{ scale: 0.98 }} className="w-full">
+                      <Button 
+                        variant="primary" 
+                        className="w-full rounded-[1.25rem] bg-gradient-to-r from-gold-deep via-gold-champagne to-gold-deep text-black-pure font-bold hover:brightness-110 shadow-[0_4px_20px_rgba(212,175,106,0.15)] select-none border-none py-3.5"
+                      >
+                        Solicitar Nova Redefinição
+                      </Button>
+                    </motion.div>
+                  </Link>
                 </div>
-                <Link href="/recuperar-senha" className="w-full inline-block">
-                  <Button variant="primary" className="w-full">
-                    Solicitar Nova Redefinição
-                  </Button>
+              )}
+
+              <div className="mt-8 text-center text-xs text-silver-metallic/60 font-sans">
+                Lembrou sua senha?{' '}
+                <Link href="/login" className="text-gold-champagne hover:underline font-bold transition-colors">
+                  Voltar para o Login
                 </Link>
               </div>
-            )}
-
-            <div className="mt-6 text-center text-xs text-zinc-400 font-sans">
-              Lembrou sua senha?{' '}
-              <Link href="/login" className="text-primary hover:underline font-semibold">
-                Voltar para o Login
-              </Link>
-            </div>
-          </CardContent>
-        </Card>
+            </CardContent>
+          </Card>
+        </div>
       </motion.div>
     </div>
   );

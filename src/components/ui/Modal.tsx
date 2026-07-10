@@ -36,7 +36,7 @@ export function Modal({ isOpen, onClose, title, children, className }: ModalProp
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={onClose}
-            className="fixed inset-0 bg-black/60 backdrop-blur-xs cursor-pointer"
+            className="fixed inset-0 bg-black/75 backdrop-blur-sm cursor-pointer"
           />
 
           {/* Modal Container */}
@@ -50,20 +50,20 @@ export function Modal({ isOpen, onClose, title, children, className }: ModalProp
             }}
             exit={{ scale: 0.95, opacity: 0, y: 10 }}
             className={cn(
-              "relative z-10 w-full max-w-md rounded-lg border border-zinc-800 bg-zinc-900 p-6 text-zinc-50 shadow-none overflow-hidden",
+              "relative z-10 w-full max-w-md rounded-2xl border border-white/[0.08] bg-[#121212]/95 backdrop-blur-xl p-6 text-warm-white shadow-2xl shadow-black/85 overflow-hidden",
               className
             )}
           >
             {/* Header */}
-            <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center justify-between mb-5">
               {title ? (
-                <h3 className="text-lg font-semibold text-zinc-50">{title}</h3>
+                <h3 className="text-lg font-bold font-display text-warm-white tracking-wide">{title}</h3>
               ) : (
                 <div />
               )}
               <button
                 onClick={onClose}
-                className="rounded-sm opacity-75 ring-offset-zinc-900 transition-opacity hover:opacity-100 focus:outline-none focus:ring-1 focus:ring-primary cursor-pointer p-1 hover:bg-zinc-850"
+                className="rounded-lg opacity-75 transition-opacity hover:opacity-100 focus:outline-none focus:ring-1 focus:ring-gold-champagne cursor-pointer p-1.5 hover:bg-white/[0.05]"
               >
                 <X className="h-4 w-4" />
                 <span className="sr-only">Fechar</span>
@@ -71,7 +71,7 @@ export function Modal({ isOpen, onClose, title, children, className }: ModalProp
             </div>
 
             {/* Content */}
-            <div className="text-sm text-zinc-300">
+            <div className="text-sm text-silver-metallic">
               {children}
             </div>
           </motion.div>
@@ -80,3 +80,4 @@ export function Modal({ isOpen, onClose, title, children, className }: ModalProp
     </AnimatePresence>
   );
 }
+
