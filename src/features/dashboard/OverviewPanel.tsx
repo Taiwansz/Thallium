@@ -1,0 +1,354 @@
+'use client';
+
+import React, { useState } from 'react';
+import { useAuth } from '@/hooks/useAuth';
+import { supabase } from '@/lib/supabase';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { formatCurrency, formatCPF } from '@/lib/utils';
+import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/Card';
+import { Button } from '@/components/ui/Button';
+import { Modal } from '@/components/ui/Modal';
+import { Input } from '@/components/ui/Input';
+import { useToast } from '@/components/ui/Toast';
+import { ArrowUpRight, ArrowDownLeft, Plus, Minus, Smartphone, FileText, Wallet } from 'lucide-react';
+
+interface Transaction {
+  id_transacao: string;
+  numero_conta: number;
+  tipo_transacao: string;
+  valor: number;
+  data_transacao: string;
+  descricao: string;
+  categoria: string;
+}
+
+export function OverviewPanel() {
+  const { profile, conta, refreshConta } = useAuth();
+  const queryClient = useQueryClient();
+  const { toast } = useToast();
+
+  // Modals state
+  const [modalType, setModalType] = useState<'deposit' | 'withdraw' | 'boleto' | 'recharge' | null>(null);
+  const [amount, setAmount] = useState('');
+  const [description, setDescription] = useState('');
+  const [targetCode, setTargetCode] = useState(''); // barcode or phone number
+  const [operator, setOperator] = useState('Vivo'); // for recharge
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // Fetch recent transactions (last 5)
+  const { data: recentTransactions, isLoading } = useQuery<Transaction[]>({
+    queryKey: ['recentTransactions', conta?.numero_conta],
+    queryFn: async () => {
+      if (!conta) return [];
+      const { data, error } = await supabase
+        .from('transacoes')
+        .select('*')
+        .eq('numero_conta', conta.numero_conta)
+        .order('data_transacao', { ascending: false })
+        .limit(5);
+
+      if (error) throw error;
+      return data || [];
+    },
+    enabled: !!conta,
+  });
+
+  const handleAction = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!conta || !profile) return;
+
+    const val = parseFloat(amount);
+    if (isNaN(val) || val <= 0) {
+      toast('Insira um valor numérico válido maior que zero.', 'error');
+      return;
+    }
+
+    setIsSubmitting(true);
+    try {
+      if (modalType === 'deposit') {
+        const { error } = await supabase.rpc('realizar_deposito', {
+          p_valor: val,
+          p_descricao: description || 'Depósito direto',
+        });
+        if (error) throw error;
+        toast('Depósito efetuado com sucesso!', 'success');
+      } else if (modalType === 'withdraw') {
+        const { error } = await supabase.rpc('realizar_saque', {
+          p_valor: val,
+          p_descricao: description || 'Saque em espécie',
+        });
+        if (error) throw error;
+        toast('Saque efetuado com sucesso!', 'success');
+      } else if (modalType === 'boleto') {
+        if (!targetCode) {
+          toast('Código de barras do boleto é obrigatório.', 'error');
+          setIsSubmitting(false);
+          return;
+        }
+        const { error } = await supabase.rpc('pagar_boleto', {
+          p_valor: val,
+          p_cod_barras: targetCode,
+        });
+        if (error) throw error;
+        toast('Boleto pago com sucesso!', 'success');
+      } else if (modalType === 'recharge') {
+        if (!targetCode) {
+          toast('Número de telefone é obrigatório.', 'error');
+          setIsSubmitting(false);
+          return;
+        }
+        const { error } = await supabase.rpc('realizar_recarga', {
+          p_valor: val,
+          p_operadora: operator,
+          p_telefone: targetCode,
+        });
+        if (error) throw error;
+        toast('Recarga de celular realizada!', 'success');
+      }
+
+      // Cleanup & Refresh
+      setAmount('');
+      setDescription('');
+      setTargetCode('');
+      setModalType(null);
+      await refreshConta();
+      queryClient.invalidateQueries({ queryKey: ['recentTransactions'] });
+      queryClient.invalidateQueries({ queryKey: ['ledgerTransactions'] });
+    } catch (err: any) {
+      toast(err.message || 'Erro ao processar transação.', 'error');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  return (
+    <div className="space-y-8 max-w-5xl">
+      {/* Account Info Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        {/* Balance Card */}
+        <Card className="md:col-span-2 flex flex-col justify-between">
+          <CardHeader className="pb-2">
+            <CardDescription className="uppercase tracking-wider text-xs font-semibold">
+              Saldo em Conta Corrente
+            </CardDescription>
+            <CardTitle className="text-4xl md:text-5xl font-mono tracking-tight font-bold text-primary tabular-nums mt-1">
+              {conta ? formatCurrency(conta.saldo) : 'R$ 0,00'}
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="pt-0">
+            <div className="flex items-center text-xs text-zinc-400 font-mono mt-4">
+              <span>CONTA AGÊNCIA: 0001</span>
+              <span className="mx-2">•</span>
+              <span>NÚMERO: {conta?.numero_conta || '------'}</span>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Profile Card */}
+        <Card className="flex flex-col justify-between">
+          <CardHeader className="pb-2">
+            <CardDescription className="uppercase tracking-wider text-xs font-semibold">
+              Titular do Razão
+            </CardDescription>
+            <CardTitle className="text-lg font-bold text-zinc-100 truncate mt-1">
+              {profile?.nome || 'Cliente Thallium'}
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="pt-0">
+            <div className="text-xs text-zinc-400 font-mono space-y-1">
+              <div>CPF: {profile ? formatCPF(profile.cpf) : '-----------'}</div>
+              <div>E-MAIL: {profile?.email || '---------'}</div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Quick Actions Panel */}
+      <div>
+        <h3 className="text-xs font-semibold uppercase tracking-wider text-zinc-400 mb-4">
+          Ações Rápidas de Caixa
+        </h3>
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+          <Button 
+            variant="secondary" 
+            className="flex flex-col items-center justify-center p-6 h-24 rounded-lg cursor-pointer"
+            onClick={() => setModalType('deposit')}
+          >
+            <Plus className="w-5 h-5 mb-2 text-primary" />
+            <span className="text-xs font-semibold">Depositar</span>
+          </Button>
+
+          <Button 
+            variant="secondary" 
+            className="flex flex-col items-center justify-center p-6 h-24 rounded-lg cursor-pointer"
+            onClick={() => setModalType('withdraw')}
+          >
+            <Minus className="w-5 h-5 mb-2 text-rose-500" />
+            <span className="text-xs font-semibold">Sacar</span>
+          </Button>
+
+          <Button 
+            variant="secondary" 
+            className="flex flex-col items-center justify-center p-6 h-24 rounded-lg cursor-pointer"
+            onClick={() => setModalType('boleto')}
+          >
+            <FileText className="w-5 h-5 mb-2 text-zinc-400" />
+            <span className="text-xs font-semibold">Pagar Boleto</span>
+          </Button>
+
+          <Button 
+            variant="secondary" 
+            className="flex flex-col items-center justify-center p-6 h-24 rounded-lg cursor-pointer"
+            onClick={() => setModalType('recharge')}
+          >
+            <Smartphone className="w-5 h-5 mb-2 text-zinc-400" />
+            <span className="text-xs font-semibold">Recarga</span>
+          </Button>
+        </div>
+      </div>
+
+      {/* Recent Ledger Transactions */}
+      <div>
+        <h3 className="text-xs font-semibold uppercase tracking-wider text-zinc-400 mb-4">
+          Transações Recentes do Razão
+        </h3>
+        <Card className="p-0">
+          <div className="divide-y divide-zinc-800">
+            {isLoading ? (
+              <div className="p-6 text-center text-sm text-zinc-400 animate-pulse">
+                Carregando registros...
+              </div>
+            ) : !recentTransactions || recentTransactions.length === 0 ? (
+              <div className="p-6 text-center text-sm text-zinc-500">
+                Nenhuma movimentação registrada neste ledger.
+              </div>
+            ) : (
+              recentTransactions.map((tx) => {
+                const isCredit = tx.valor > 0;
+                return (
+                  <div key={tx.id_transacao} className="p-4 flex items-center justify-between hover:bg-zinc-850 transition-colors">
+                    <div className="flex items-center space-x-4">
+                      <div className={`w-8 h-8 rounded-full flex items-center justify-center ${isCredit ? 'bg-primary/10 text-primary' : 'bg-rose-500/10 text-rose-500'}`}>
+                        {isCredit ? <ArrowDownLeft className="w-4 h-4" /> : <ArrowUpRight className="w-4 h-4" />}
+                      </div>
+                      <div>
+                        <div className="text-sm font-semibold text-zinc-200">{tx.tipo_transacao}</div>
+                        <div className="text-xs text-zinc-400 font-sans">{tx.descricao || 'Sem descrição'}</div>
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      <div className={`text-sm font-mono font-semibold tabular-nums ${isCredit ? 'text-primary' : 'text-zinc-300'}`}>
+                        {isCredit ? '+' : ''}{formatCurrency(tx.valor)}
+                      </div>
+                      <div className="text-[10px] text-zinc-500 font-mono">
+                        {new Date(tx.data_transacao).toLocaleDateString('pt-BR')} {new Date(tx.data_transacao).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}
+                      </div>
+                    </div>
+                  </div>
+                );
+              })
+            )}
+          </div>
+        </Card>
+      </div>
+
+      {/* Transaction Modals */}
+      <Modal 
+        isOpen={modalType !== null} 
+        onClose={() => { setModalType(null); setAmount(''); setDescription(''); setTargetCode(''); }}
+        title={
+          modalType === 'deposit' ? 'Registrar Depósito' :
+          modalType === 'withdraw' ? 'Solicitar Saque' :
+          modalType === 'boleto' ? 'Pagamento de Boleto' : 'Recarga de Celular'
+        }
+      >
+        <form onSubmit={handleAction} className="space-y-4">
+          <Input
+            label="Valor (R$)"
+            type="number"
+            step="0.01"
+            placeholder="0,00"
+            required
+            value={amount}
+            onChange={(e) => setAmount(e.target.value)}
+            disabled={isSubmitting}
+          />
+
+          {modalType === 'deposit' && (
+            <Input
+              label="Descrição do Depósito"
+              placeholder="Ex: Depósito dinheiro extra"
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              disabled={isSubmitting}
+            />
+          )}
+
+          {modalType === 'withdraw' && (
+            <Input
+              label="Motivo / Descrição"
+              placeholder="Ex: Saque compras básicas"
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              disabled={isSubmitting}
+            />
+          )}
+
+          {modalType === 'boleto' && (
+            <Input
+              label="Código de Barras do Boleto"
+              placeholder="34191.79001 01043.513184 91020.150008 7 900000000350"
+              required
+              value={targetCode}
+              onChange={(e) => setTargetCode(e.target.value)}
+              disabled={isSubmitting}
+            />
+          )}
+
+          {modalType === 'recharge' && (
+            <>
+              <div className="flex flex-col space-y-1.5 w-full">
+                <label className="text-xs font-semibold uppercase tracking-wider text-zinc-400">
+                  Operadora
+                </label>
+                <select
+                  value={operator}
+                  onChange={(e) => setOperator(e.target.value)}
+                  disabled={isSubmitting}
+                  className="flex w-full rounded-[0.375rem] border border-zinc-800 bg-[#09090b] px-3.5 py-2.5 text-sm text-zinc-50 focus:outline-none focus:border-primary"
+                >
+                  <option value="Vivo">Vivo</option>
+                  <option value="Claro">Claro</option>
+                  <option value="Tim">Tim</option>
+                  <option value="Oi">Oi</option>
+                </select>
+              </div>
+              <Input
+                label="Número do Telefone"
+                placeholder="(11) 99999-9999"
+                required
+                value={targetCode}
+                onChange={(e) => setTargetCode(e.target.value)}
+                disabled={isSubmitting}
+              />
+            </>
+          )}
+
+          <div className="flex justify-end gap-3 mt-6">
+            <Button 
+              type="button" 
+              variant="ghost" 
+              onClick={() => { setModalType(null); setAmount(''); setDescription(''); setTargetCode(''); }}
+              disabled={isSubmitting}
+            >
+              Cancelar
+            </Button>
+            <Button type="submit" isLoading={isSubmitting}>
+              Confirmar Operação
+            </Button>
+          </div>
+        </form>
+      </Modal>
+    </div>
+  );
+}
