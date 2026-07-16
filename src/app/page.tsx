@@ -4,7 +4,7 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { ArrowRight, ShieldCheck, Cpu, CreditCard, Landmark, TrendingUp } from 'lucide-react';
+import { ArrowRight, ShieldCheck, Cpu, CreditCard, Landmark } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 export default function LandingPage() {
@@ -271,7 +271,7 @@ export default function LandingPage() {
       {/* Edge-to-Edge Technical Protocol Rows (Portfolio Layout) */}
       <section className="w-full px-6 md:px-16 lg:px-24 py-28 relative z-10 max-w-none">
         <div className="section-header mb-16 text-left">
-          <p className="text-[10px] tracking-[0.2em] font-mono text-gold-champagne uppercase">// ESPECIFICAÇÕES DO PROTOCOLO</p>
+          <p className="text-[10px] tracking-[0.2em] font-mono text-gold-champagne uppercase">{"// ESPECIFICAÇÕES DO PROTOCOLO"}</p>
           <h2 className="font-display text-3xl md:text-5xl font-extrabold text-warm-white tracking-tight mt-3">
             Engenharia de Ledger Sistemática
           </h2>
@@ -325,7 +325,7 @@ export default function LandingPage() {
       {/* Edge-to-Edge Bento Grid Section */}
       <section className="w-full px-6 md:px-16 lg:px-24 py-12 relative z-10 max-w-none">
         <div className="section-header mb-16 text-left">
-          <p className="text-[10px] tracking-[0.2em] font-mono text-gold-champagne uppercase">// RECURSOS OPERACIONAIS</p>
+          <p className="text-[10px] tracking-[0.2em] font-mono text-gold-champagne uppercase">{"// RECURSOS OPERACIONAIS"}</p>
           <h2 className="font-display text-3xl md:text-5xl font-extrabold text-warm-white tracking-tight mt-3">
             Interface de Consistência
           </h2>
