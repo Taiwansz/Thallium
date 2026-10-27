@@ -1,5 +1,6 @@
 # Thallium Ledger Core
 
+[![CI](https://github.com/Taiwansz/Thallium/actions/workflows/ci.yml/badge.svg)](https://github.com/Taiwansz/Thallium/actions/workflows/ci.yml)
 [![Next.js 16](https://img.shields.io/badge/Next.js-16.2.10-000000?style=flat-square&logo=next.js&logoColor=white)](https://nextjs.org/)
 [![Tailwind CSS v4](https://img.shields.io/badge/Tailwind_CSS-v4.0.0-38bdf8?style=flat-square&logo=tailwind-css&logoColor=white)](https://tailwindcss.com/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.x-3178c6?style=flat-square&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
